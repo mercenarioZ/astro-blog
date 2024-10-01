@@ -1,0 +1,20 @@
+---
+import Content from "../components/Content.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import MainLayout from "../layouts/MainLayout.astro";
+---
+
+<MainLayout title="Main page">
+  <Header />
+  <main class="pt-[60px]">
+    <h1 class="text-center mb-3">A simple <span class="text-orange-500 font-bold">blog</span> about everything.</h1>
+
+    <Content>
+      <section class="mb-8 indent-4">
+        <p>Main content will appear here.</p>
+      </section>
+    </Content>
+  </main>
+  <Footer />
+</MainLayout>

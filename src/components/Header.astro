@@ -1,0 +1,26 @@
+---
+import HeaderLink from "./HeaderLink.astro";
+import {IoLogoGithub} from "react-icons/io5";
+import ThemeToggle from "./ThemeToggleBtn";
+---
+
+<header class="fixed w-full p-2 z-20 backdrop-blur-md">
+  <div class="mx-auto max-w-3xl">
+    <nav class="flex items-center gap-3 text-base">
+      <a
+        href="/"
+        class="group"
+      >
+        <h2 class="font-bold">Nai's blog</h2>
+      </a>
+
+      <div class="items-center gap-6 hidden md:flex">
+        <HeaderLink href="/about">About</HeaderLink>
+        <HeaderLink href='#'><IoLogoGithub /> GitHub</HeaderLink>
+      </div>
+      <div class="flex-1"></div>
+      
+      <ThemeToggle client:load />
+    </nav>
+  </div>
+</header>
