@@ -1,18 +1,65 @@
 ---
+import { IoArrowForward } from "react-icons/io5";
 import Content from "../components/Content.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import MainLayout from "../layouts/MainLayout.astro";
+import { INSTAGRAM_URL } from "../config";
+import Masthead from "../components/Masthead.astro";
+import { Image } from "astro:assets";
+
+const posts = (await Astro.glob("./posts/*.md")).sort(
+  (a: any, b: any) =>
+    new Date(b.frontmatter.createdAt).valueOf() -
+    new Date(a.frontmatter.createdAt).valueOf()
+);
 ---
 
 <MainLayout title="Main page">
   <Header />
   <main class="pt-[60px]">
-    <h1 class="text-center mb-3">A simple <span class="text-orange-500 font-bold">blog</span> about everything.</h1>
+    <h1 class="text-center mb-6 text-2xl">
+      A simple <span class="text-orange-500 font-bold">blog</span> about everything.
+    </h1>
+
+    <!-- <Masthead /> -->
 
     <Content>
-      <section class="mb-8 indent-4">
-        <p>Main content will appear here.</p>
+      <section>
+        <p class="mb-6 indent-4">
+          Hello there, I&apos;m Le Ba Nguyen Vu, currently a college student. As
+          a fourth year student, I&apos;ve been spending hours studying at my
+          desk. With the desire to learn about <span class="text-orange-500"
+            >writing skill</span
+          >, I created this blog to enhance this skill. I&apos;ll write about
+          things that interest me, such as items I use, interesting knowledge I
+          learn, new programming technologies, etc.
+          <a
+            target="_blank"
+            class="inline-flex items-center gap-1 indent-1 hover:text-orange-300 text-orange-500 transition"
+            href={INSTAGRAM_URL}
+            >More about me <IoArrowForward /></a
+          >
+        </p>
+
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {
+            posts.map((p) => (
+              <li class="text-center mb-4">
+                <a href={p.url}>
+                  {/* <Image
+                    src={p.frontmatter.heroImage}
+                    alt="thumbnail"
+                    class="border boder-slate-400 dark:border-zinc-700 rounded-xl"
+                  /> */}
+                  <div class="text-lg mb-2">{p.frontmatter.title}</div>
+
+                  <div class="opacity-80">{p.frontmatter.description}</div>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
       </section>
     </Content>
   </main>

@@ -1,5 +1,5 @@
 ---
-const { title } = Astro.props;
+const { title, description, image = "/astrojs.jpg" } = Astro.props;
 ---
 
 <head>
@@ -18,4 +18,50 @@ const { title } = Astro.props;
     content={Astro.generator}
   />
   <title>{title}</title>
+
+  <!-- Open Graph / Facebook -->
+  <meta
+    property="og:type"
+    content="website"
+  />
+  <meta
+    property="og:url"
+    content={Astro.url}
+  />
+  <meta
+    property="og:title"
+    content={title}
+  />
+  <meta
+    property="og:description"
+    content={description}
+  />
+  <meta
+    property="og:image"
+    content={new URL(image, Astro.url)}
+  />
+
+  <!-- This script is used to prevent flash when reloading -->
+  <script is:inline>
+    const theme = (() => {
+      if (
+        typeof localStorage !== "undefined" &&
+        localStorage.getItem("theme")
+      ) {
+        return localStorage.getItem("theme");
+      }
+
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+      }
+
+      return "light";
+    })();
+
+    if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
 </head>
