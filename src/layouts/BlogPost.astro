@@ -1,0 +1,56 @@
+---
+import { Image } from "astro:assets";
+import Header from "../components/Header.astro";
+import Body from "../components/Body.astro";
+import MainHead from "./MainHead.astro";
+import Content from "../components/Content.astro";
+
+export interface Props {
+  content: {
+    title: string;
+    description: string;
+    createdAt?: string;
+    updatedAt?: string;
+    heroImage?: string;
+    tags?: string[];
+  };
+}
+
+const {
+  content: { title, description, heroImage = "" },
+} = Astro.props;
+---
+
+<MainHead
+  title="Post"
+  image={heroImage}
+/>
+
+<Body>
+  <Header />
+
+  <main class="pt-[60px]">
+    <Content>
+      <div>
+        {
+          heroImage && (
+            <Image
+              src={heroImage}
+              alt={title}
+              class="rounded-xl border border-slate-400 dark:border-zinc-700 shadow-xl"
+              width={720}
+              height={480}
+            />
+          )
+        }
+      </div>
+
+      <h1>{title}</h1>
+      <div>{description}</div>
+
+      <hr>
+
+      <slot />
+    </Content>
+  </main>
+</Body>

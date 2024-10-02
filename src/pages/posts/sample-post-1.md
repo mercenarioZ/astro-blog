@@ -5,6 +5,7 @@ tags:
   - tech
   - sample
 createdAt: 1727781560570
-heroImage: ../../../public/astrojs.jpg 
+heroImage: /src/assets/astrojs.jpg 
 slug: sample-post-1
+layout: ../../layouts/BlogPost.astro
 ---
