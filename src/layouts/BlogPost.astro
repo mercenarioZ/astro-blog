@@ -17,21 +17,21 @@ export interface Props {
 }
 
 const {
-  content: { title, description, heroImage = "" },
+  content: { title, description, heroImage = "", createdAt },
 } = Astro.props;
 ---
 
 <MainHead
-  title="Post"
+  title={title}
   image={heroImage}
 />
 
 <Body>
   <Header />
 
-  <main class="pt-[60px]">
-    <Content>
-      <div>
+  <main class="pt-[50px]">
+    <Content className="markdown-body pt-4">
+      <div class="mb-6">
         {
           heroImage && (
             <Image
@@ -44,11 +44,12 @@ const {
           )
         }
       </div>
+      <div class="mb-4 flex flex-col items-center">
+        <h1 class="font-bold text-3xl mb-4">{title}</h1>
+        <div class="opacity-75">{description}</div>
+      </div>
 
-      <h1>{title}</h1>
-      <div>{description}</div>
-
-      <hr>
+      <hr class="my-4 border-top border-zinc-600" />
 
       <slot />
     </Content>
