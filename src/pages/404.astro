@@ -1,14 +1,30 @@
-<!DOCTYPE html>
+---
+import { IoChevronForward } from "react-icons/io5";
+import Body from "../components/Body.astro";
+import Content from "../components/Content.astro";
+import Header from "../components/Header.astro";
+import MainHead from "../layouts/MainHead.astro";
+---
+
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-</head>
-<body class="h-[100vh] p-0 m-0">
-  <div class="flex flex-col text-[45px] font-bold items-center justify-center h-full">
-    <h1>404</h1>
-    <p>Page not found</p> 
-  </div>
-</body>
+  <MainHead title="Not found" />
+
+  <Body class="h-[100vh]">
+    <Header />
+
+    <main class="pt-[50px]">
+      <Content className="flex flex-col gap-4 items-center mt-10">
+        <div class="text-3xl mt-14 mb-6">Oops! Page not found...</div>
+
+        <div>
+          <a
+            href="/"
+            class="inline-flex items-center gap-1 underline underline-offset-2 opacity-70 hover:opacity-90 transition"
+            >Go back to index page <IoChevronForward /></a
+          >
+        </div>
+      </Content>
+    </main>
+  </Body>
 </html>
