@@ -53,8 +53,8 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
                 <a href={p.url}>
                   <Image
                     width={720}
-                    height={720 / 1.7777}
-                    src={p.frontmatter.heroImage}
+                    height={480}
+                    src={p.frontmatter.heroImage || "/src/assets/astrojs.jpg"}
                     alt="thumbnail"
                     class="border mb-2 dark:hover:border-zinc-500 transition boder-slate-400 dark:border-zinc-700 rounded-xl shadow-xl"
                   />
