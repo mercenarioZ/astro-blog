@@ -1,6 +1,6 @@
 ---
 title: Zuoya LMK81
-description: My main keyboard is a custom aluminum keyboard with a hot-swappable PCB Zuoya LMK81.
+description: Main keyboard to use daily 
 slug: lmk-81
 tag:
   - uses

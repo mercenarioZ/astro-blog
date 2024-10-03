@@ -54,12 +54,12 @@ const posts = (await Astro.glob("./posts/*.md")).sort(
                 <a href={p.url}>
                   <Image
                     width={720}
-                    height={720 / 1.77}
-                    src={p.frontmatter.heroImage || "/src/assets/astrojs.jpg"}
+                    height={720 / 1.65}
+                    src={p.frontmatter.heroImage}
                     alt="thumbnail"
-                    class="border mb-2 dark:hover:border-zinc-500 transition boder-slate-400 dark:border-zinc-700 rounded-xl shadow-xl"
+                    class="border mb-2 dark:hover:border-zinc-500 transition border-slate-400 dark:border-zinc-700 rounded-xl shadow-xl hover:scale-105 duration-300"
                   />
-                  <div class="text-lg mb-2">{p.frontmatter.title}</div>
+                  <div class="text-lg mb-2 mt-4">{p.frontmatter.title}</div>
 
                   <div class="opacity-80">{p.frontmatter.description}</div>
                 </a>
@@ -71,6 +71,5 @@ const posts = (await Astro.glob("./posts/*.md")).sort(
     </Content>
   </main>
 
-  <hr class="max-w-4xl mx-auto border-gray-300 mt-8">
   <Footer />
 </MainLayout>

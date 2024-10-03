@@ -1,5 +1,5 @@
 ---
-description: My main phone is an iPhone 13 Pro Max with 256GB storage in Graphite color. 
+description: Main phone in Graphite color 
 title: iPhone 13 Pro Max
 createdAt: 2024-10-03 
 layout: ../../layouts/BlogPost.astro
