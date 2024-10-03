@@ -19,6 +19,15 @@ export interface Props {
 const {
   content: { title, description, heroImage = "", createdAt },
 } = Astro.props;
+
+const formattedDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 ---
 
 <MainHead
@@ -81,7 +90,7 @@ const {
             <Image
               src={heroImage || "/src/assets/astrojs.jpg"}
               alt={title}
-              class="rounded-xl border border-slate-400 dark:border-zinc-700 shadow-xl"
+              class="rounded-xl w-[720px] h-[360px] object-cover border border-slate-400 dark:border-zinc-700 shadow-xl"
               width={720}
               height={480}
             />
@@ -89,12 +98,8 @@ const {
         }
       </div>
 
-      <div class="opacity-75 underline">
-        {
-          createdAt && (
-            <p>{createdAt}</p>
-          )
-        }
+      <div class="opacity-75">
+        {createdAt && <p>{formattedDate(createdAt)}</p>}
       </div>
 
       <div class="mb-4 flex flex-col items-center">
@@ -103,8 +108,9 @@ const {
       </div>
 
       <hr class="my-4 border-top border-zinc-600" />
-
-      <slot />
+      <div class="indent-4 text-justify">
+        <slot />
+      </div>
     </Content>
   </main>
 </Body>
