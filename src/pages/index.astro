@@ -4,7 +4,7 @@ import Content from "../components/Content.astro";
 import Footer from "../components/Footer.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import { INSTAGRAM_URL } from "../config";
-import Masthead from "../components/Masthead.astro";
+// import Masthead from "../components/Masthead.astro";
 import { Image } from "astro:assets";
 import Header from "../components/Header.astro";
 
@@ -20,9 +20,9 @@ const posts = (await Astro.glob("./posts/*.md")).sort(
 // );
 ---
 
-<MainLayout title="MercenarioZ&apos;s blog">
+<MainLayout title="MercenarioZ's blog">
   <Header />
-  <main class="pt-[60px]">
+  <main class="pt-[70px]">
     <h1 class="text-center mb-6 text-2xl">
       A simple <span class="text-orange-500 font-bold">blog</span> about everything.
     </h1>
@@ -30,7 +30,7 @@ const posts = (await Astro.glob("./posts/*.md")).sort(
     <!-- <Masthead /> -->
 
     <Content>
-      <section>
+      <section id="fade-target">
         <p class="mb-10 indent-4 opacity-80">
           Hello there, I&apos;m Le Ba Nguyen Vu, currently a college student. As
           a fourth year student, I&apos;ve been spending hours studying at my
@@ -41,7 +41,7 @@ const posts = (await Astro.glob("./posts/*.md")).sort(
           learn, new programming technologies, etc.
           <a
             target="_blank"
-            class="inline-flex items-center gap-1 indent-1 hover:text-orange-300 text-orange-500 transition"
+            class="inline-flex items-center gap-1 indent-1 dark:hover:text-orange-300 hover:text-orange-700 text-orange-500 transition"
             href={INSTAGRAM_URL}
             >More about me on Instagram <IoArrowForward /></a
           >
@@ -73,3 +73,12 @@ const posts = (await Astro.glob("./posts/*.md")).sort(
 
   <Footer />
 </MainLayout>
+
+<!-- <script>
+  setTimeout(() => {
+    const fadeTarget = document.getElementById("fade-target");
+
+    fadeTarget?.classList.remove("opacity-0");
+    fadeTarget?.classList.add("opacity-100");
+  }, 1000);
+</script> -->
