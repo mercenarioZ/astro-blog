@@ -4,7 +4,7 @@ description: Main keyboard to use daily
 slug: lmk-81
 tag:
   - uses
-heroImage: /src/assets/lmk-81.jpg
+heroImage: /posts/lmk-81.jpg
 createdAt: 2024-10-04
 layout: ../../layouts/BlogPost.astro
 ---

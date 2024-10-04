@@ -18,7 +18,7 @@ export interface Props {
 }
 
 const {
-  content: { title, description, heroImage = "", createdAt },
+  content: { title, description, heroImage, createdAt },
 } = Astro.props;
 
 const formattedDate = (dateStr: string) => {
@@ -89,7 +89,7 @@ const formattedDate = (dateStr: string) => {
         {
           heroImage && (
             <Image
-              src={heroImage || "/src/assets/astrojs.jpg"}
+              src={heroImage}
               alt={title}
               class="rounded-xl w-[720px] h-[360px] object-cover border border-slate-400 dark:border-zinc-700 shadow-xl"
               width={720}

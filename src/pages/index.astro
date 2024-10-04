@@ -14,10 +14,6 @@ const posts = (await Astro.glob("./posts/*.md")).sort(
     new Date(b.frontmatter.createdAt).valueOf() -
     new Date(a.frontmatter.createdAt).valueOf()
 );
-
-const images = import.meta.glob<{ default: ImageMetadata }>(
-  "/src/assets/*.{jpg,jpeg,png,gif}"
-);
 ---
 
 <MainLayout title="MercenarioZ's blog">
@@ -50,19 +46,13 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
         <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
           {
             posts.map((p) => {
-              const heroImgAssets = images[p.frontmatter.heroImage];
-
-              const heroImgSrc = heroImgAssets
-                ? heroImgAssets()
-                : p.frontmatter.heroImage;
-
               return (
                 <li class="text-center mb-4">
                   <a href={p.url}>
                     <Image
                       width={720}
                       height={720 / 1.65}
-                      src={heroImgSrc}
+                      src={p.frontmatter.heroImage}
                       alt="thumbnail"
                       class="border mb-2 dark:hover:border-zinc-500 transition border-slate-400 dark:border-zinc-700 rounded-xl shadow-xl hover:scale-105 duration-300"
                     />
@@ -81,12 +71,3 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
 
   <Footer />
 </MainLayout>
-
-<!-- <script>
-  setTimeout(() => {
-    const fadeTarget = document.getElementById("fade-target");
-
-    fadeTarget?.classList.remove("opacity-0");
-    fadeTarget?.classList.add("opacity-100");
-  }, 1000);
-</script> -->

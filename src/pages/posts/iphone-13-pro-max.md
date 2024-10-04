@@ -3,7 +3,7 @@ description: Main phone in Graphite color
 title: iPhone 13 Pro Max
 createdAt: 2024-10-03 
 layout: ../../layouts/BlogPost.astro
-heroImage: /src/assets/iphone-13-pro-max.jpg 
+heroImage: /posts/iphone-13-pro-max.jpg 
 slug: iphone-13-pro-max
 tags:
   - uses 
