@@ -7,12 +7,12 @@ interface Props {
   description?: string;
 }
 
-const { title } = Astro.props as Props;
+const { title, description } = Astro.props as Props;
 ---
 
 <!doctype html>
 <html lang="en">
-  <MainHead title={title} />
+  <MainHead title={title} description={description} />
   <Body>
     <div>
       <slot />

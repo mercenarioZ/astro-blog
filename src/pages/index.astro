@@ -3,7 +3,7 @@ import { IoArrowForward } from "react-icons/io5";
 import Content from "../components/Content.astro";
 import Footer from "../components/Footer.astro";
 import MainLayout from "../layouts/MainLayout.astro";
-import { INSTAGRAM_URL } from "../config";
+import { INSTAGRAM_URL, SITE_DESCRIPTION } from "../config";
 // import Masthead from "../components/Masthead.astro";
 import { Image } from "astro:assets";
 import Header from "../components/Header.astro";
@@ -16,7 +16,7 @@ const posts = (await Astro.glob("./posts/*.md")).sort(
 );
 ---
 
-<MainLayout title="MercenarioZ's blog">
+<MainLayout description={SITE_DESCRIPTION} title="MercenarioZ's blog">
   <Header />
   <main class="pt-[70px]">
     <h1 class="text-center mb-6 text-2xl">
