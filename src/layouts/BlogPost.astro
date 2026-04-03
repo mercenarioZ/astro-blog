@@ -1,5 +1,4 @@
 ---
-import { Image } from "astro:assets";
 import Header from "../components/Header.astro";
 import Body from "../components/Body.astro";
 import MainHead from "./MainHead.astro";
@@ -87,16 +86,18 @@ const formattedDate = (dateStr: string) => {
 
   <main class="pt-[50px]">
     <Content className="markdown-body pt-4">
-      <div class="mb-6">
+      <div class="mb-6 flex justify-center">
         {
           heroImage && (
-            <Image
-              src={heroImage}
-              alt={title}
-              class="rounded-xl w-[720px] h-[360px] object-cover border border-slate-400 dark:border-zinc-700 shadow-xl"
-              width={720}
-              height={480}
-            />
+            <div class="w-full max-w-[720px] h-auto rounded-xl border border-slate-400 dark:border-zinc-700 shadow-xl bg-slate-100 dark:bg-zinc-800/60 overflow-hidden">
+              <img
+                src={heroImage}
+                alt={title}
+                class="block w-full h-full object-cover mb-0 border-0 shadow-none"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
           )
         }
       </div>
@@ -111,7 +112,7 @@ const formattedDate = (dateStr: string) => {
       </div>
 
       <!-- <hr class="my-4 border-top border-zinc-600" /> -->
-      <div class="indent-4 pt-4 text-justify">
+      <div class="indent-4 pt-4 ">
         <slot />
       </div>
     </Content>
