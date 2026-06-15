@@ -85,21 +85,41 @@ const { title, description, image = "/posts/lmk-81.jpg" } = Astro.props;
 
 <!-- This script is used to prevent flash when reloading -->
 <script is:inline>
-  const theme = (() => {
-    if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
-      return localStorage.getItem("theme");
-    }
+  (() => {
+    const getTheme = () => {
+      if (
+        typeof localStorage !== "undefined" &&
+        localStorage.getItem("theme")
+      ) {
+        return localStorage.getItem("theme");
+      }
 
-    if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+      }
 
-    return "light";
+      return "light";
+    };
+
+    const applyTheme = (root = document.documentElement) => {
+      const theme = getTheme();
+
+      root.classList.toggle("dark", theme === "dark");
+      return theme;
+    };
+
+    applyTheme();
+
+    if (!window.__themeTransitionHandlerAttached) {
+      document.addEventListener("astro:before-swap", (event) => {
+        applyTheme(event.newDocument.documentElement);
+      });
+
+      document.addEventListener("astro:after-swap", () => {
+        applyTheme();
+      });
+
+      window.__themeTransitionHandlerAttached = true;
+    }
   })();
-
-  if (theme === "light") {
-    document.documentElement.classList.remove("dark");
-  } else {
-    document.documentElement.classList.add("dark");
-  }
 </script>
