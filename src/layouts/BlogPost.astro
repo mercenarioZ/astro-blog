@@ -59,11 +59,11 @@ const formattedDate = (dateStr: string) => {
       }
 
       h2 {
-        @apply text-3xl mb-1;
+        @apply mt-10 mb-4 text-3xl;
       }
 
       h3 {
-        @apply text-2xl;
+        @apply mt-8 mb-3 text-2xl;
       }
 
       h4 {
@@ -76,6 +76,51 @@ const formattedDate = (dateStr: string) => {
 
       p {
         @apply mb-4;
+      }
+
+      :not(pre) > code {
+        @apply rounded bg-slate-200 px-1.5 py-0.5 text-sm text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100;
+      }
+
+      pre {
+        @apply mb-6 overflow-x-auto rounded-lg border border-slate-300 bg-zinc-950 p-4 text-sm text-zinc-100 shadow-xl dark:border-zinc-700;
+      }
+
+      pre code {
+        @apply bg-transparent p-0 text-inherit;
+      }
+
+      table {
+        @apply mb-6 w-full border-collapse overflow-hidden rounded-lg border border-slate-300 text-left text-sm shadow-lg dark:border-zinc-700;
+      }
+
+      thead {
+        @apply bg-slate-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100;
+      }
+
+      th,
+      td {
+        @apply border-b border-slate-300 px-4 py-3 align-top dark:border-zinc-700;
+      }
+
+      th {
+        @apply font-bold;
+      }
+
+      tbody tr:last-child td {
+        @apply border-b-0;
+      }
+
+      tbody tr {
+        @apply bg-white/45 dark:bg-zinc-900/45;
+      }
+
+      tbody tr:nth-child(even) {
+        @apply bg-slate-100/70 dark:bg-zinc-800/35;
+      }
+
+      td:first-child {
+        @apply w-32 whitespace-nowrap font-medium;
       }
 
       a {
