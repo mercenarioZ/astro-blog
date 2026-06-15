@@ -147,8 +147,8 @@ const formattedDate = (dateStr: string) => {
         }
       </div>
 
-      <div class="post-enter post-enter-meta opacity-75">
-        {createdAt && <p>{formattedDate(createdAt)}</p>}
+      <div class="post-enter post-enter-meta">
+        {createdAt && <p class="post-date"><i>{formattedDate(createdAt)}</i></p>}
       </div>
 
       <div class="post-enter post-enter-title mb-4 flex flex-col items-center">
@@ -177,6 +177,10 @@ const formattedDate = (dateStr: string) => {
 
   .post-enter-meta {
     animation-delay: 180ms;
+  }
+
+  .post-date {
+    opacity: 0.45;
   }
 
   .post-enter-title {
