@@ -12,6 +12,8 @@ interface PostModule {
   frontmatter: {
     createdAt: string;
     heroImage: string;
+    tag?: string[];
+    tags?: string[];
     title: string;
     description: string;
   };
@@ -28,6 +30,22 @@ posts.sort(
     new Date(b.frontmatter.createdAt).valueOf() -
     new Date(a.frontmatter.createdAt).valueOf()
 );
+
+const [featuredPost, ...secondaryPosts] = posts;
+
+const postDateFormatter = new Intl.DateTimeFormat("en", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
+const getPostTag = (post: PostModule) => {
+  const tag = post.frontmatter.tags?.[0] ?? post.frontmatter.tag?.[0] ?? "Post";
+  return tag.charAt(0).toUpperCase() + tag.slice(1);
+};
+
+const getPostDate = (post: PostModule) =>
+  postDateFormatter.format(new Date(post.frontmatter.createdAt));
 ---
 
 <MainLayout description={SITE_DESCRIPTION} title="MercenarioZ's blog">
@@ -37,9 +55,9 @@ posts.sort(
       A small blog about everything.
     </h1>
 
-    <Content>
+    <Content className="max-w-[1320px]">
       <section id="fade-target">
-        <p class="mb-10 indent-4 opacity-80">
+        <p class="mb-12 max-w-3xl mx-auto indent-4 opacity-80">
           Hello there, I&apos;m Le Ba Nguyen Vu, a graduated college student. I&apos;ve been spending hours studying at my
           desk. With the desire to learn about <span class="text-orange-500"
             >writing skill</span
@@ -54,31 +72,185 @@ posts.sort(
           >
         </p>
 
-        <ul class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          class="grid grid-cols-1 gap-10 lg:grid-cols-[repeat(16,minmax(0,1fr))] lg:gap-10 xl:gap-12"
+        >
           {
-            posts.map((p) => {
-              return (
-                <li class="text-center mb-4">
-                  <a href={p.url}>
+            secondaryPosts[0] && (
+              <aside
+                class="magazine-card magazine-card-left order-2 border-t border-slate-300 pt-10 dark:border-zinc-700 lg:order-1 lg:col-span-4 lg:border-t-0 lg:border-r lg:pr-10 xl:pr-12"
+              >
+                <a href={secondaryPosts[0].url} class="group block">
+                  <figure
+                    class="magazine-image mb-5 aspect-[1.55/1] w-full overflow-hidden border border-slate-400 dark:border-zinc-700"
+                  >
                     <Image
-                      width={720}
-                      height={720 / 1.65}
-                      src={p.frontmatter.heroImage}
-                      alt="thumbnail"
-                      class="border mb-2 transition border-slate-400 dark:border-zinc-700 rounded-xl shadow-xl hover:scale-105 duration-300"
+                      width={520}
+                      height={520 / 1.55}
+                      src={secondaryPosts[0].frontmatter.heroImage}
+                      alt={secondaryPosts[0].frontmatter.title}
+                      class="magazine-cover h-full w-full object-cover"
                     />
-                    <div class="text-lg mb-2 mt-4">{p.frontmatter.title}</div>
-
-                    <div class="opacity-80">{p.frontmatter.description}</div>
-                  </a>
-                </li>
-              );
-            })
+                  </figure>
+                  <div class="mb-3 text-xs font-semibold uppercase text-orange-500">
+                    {getPostTag(secondaryPosts[0])}
+                  </div>
+                  <h2 class="text-xl font-bold leading-tight">
+                    {secondaryPosts[0].frontmatter.title}
+                  </h2>
+                  <p class="mt-3 opacity-80">
+                    {secondaryPosts[0].frontmatter.description}
+                  </p>
+                  <p class="mt-4 text-sm font-medium opacity-60">
+                    {getPostDate(secondaryPosts[0])}
+                  </p>
+                </a>
+              </aside>
+            )
           }
-        </ul>
+
+          {
+            featuredPost && (
+              <a
+                href={featuredPost.url}
+                class="magazine-card magazine-card-featured group order-1 block text-center lg:order-2 lg:col-span-8 lg:px-1"
+              >
+                <figure
+                  class="magazine-image aspect-[1.618/1] w-full overflow-hidden border border-slate-400 dark:border-zinc-700"
+                >
+                  <Image
+                    width={1040}
+                    height={1040 / 1.618}
+                    src={featuredPost.frontmatter.heroImage}
+                    alt={featuredPost.frontmatter.title}
+                    class="magazine-cover h-full w-full object-cover"
+                  />
+                </figure>
+                <div class="mt-7 text-xs font-semibold uppercase text-orange-500">
+                  {getPostTag(featuredPost)}
+                </div>
+                <h2 class="mt-3 text-3xl font-bold leading-tight lg:text-4xl">
+                  {featuredPost.frontmatter.title}
+                </h2>
+
+                <p class="mx-auto mt-4 max-w-2xl text-lg opacity-80">
+                  {featuredPost.frontmatter.description}
+                </p>
+                <p class="mt-5 text-sm font-medium opacity-60">
+                  {getPostDate(featuredPost)}
+                </p>
+              </a>
+            )
+          }
+
+          {
+            secondaryPosts[1] && (
+              <aside
+                class="magazine-card magazine-card-right order-3 border-t border-slate-300 pt-10 dark:border-zinc-700 lg:col-span-4 lg:border-t-0 lg:border-l lg:pl-10 xl:pl-12"
+              >
+                <a href={secondaryPosts[1].url} class="group block">
+                  <figure
+                    class="magazine-image mb-5 aspect-[1.55/1] w-full overflow-hidden border border-slate-400 dark:border-zinc-700"
+                  >
+                    <Image
+                      width={520}
+                      height={520 / 1.55}
+                      src={secondaryPosts[1].frontmatter.heroImage}
+                      alt={secondaryPosts[1].frontmatter.title}
+                      class="magazine-cover h-full w-full object-cover"
+                    />
+                  </figure>
+                  <div class="mb-3 text-xs font-semibold uppercase text-orange-500">
+                    {getPostTag(secondaryPosts[1])}
+                  </div>
+                  <h2 class="text-xl font-bold leading-tight">
+                    {secondaryPosts[1].frontmatter.title}
+                  </h2>
+                  <p class="mt-3 opacity-80">
+                    {secondaryPosts[1].frontmatter.description}
+                  </p>
+                  <p class="mt-4 text-sm font-medium opacity-60">
+                    {getPostDate(secondaryPosts[1])}
+                  </p>
+                </a>
+              </aside>
+            )
+          }
+        </div>
       </section>
     </Content>
   </main>
 
   <Footer />
 </MainLayout>
+
+<style>
+  .magazine-card {
+    animation: magazine-card-enter 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: opacity, transform;
+  }
+
+  .magazine-card-left {
+    animation-delay: 120ms;
+  }
+
+  .magazine-card-featured {
+    animation-delay: 40ms;
+  }
+
+  .magazine-card-right {
+    animation-delay: 220ms;
+  }
+
+  .magazine-image {
+    transition:
+      transform 350ms ease,
+      box-shadow 350ms ease;
+  }
+
+  .magazine-cover {
+    transition:
+      transform 650ms cubic-bezier(0.22, 1, 0.36, 1),
+      filter 350ms ease,
+      opacity 350ms ease;
+  }
+
+  .magazine-card:hover .magazine-image {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 45px rgb(0 0 0 / 12%);
+  }
+
+  .magazine-card:hover .magazine-cover {
+    filter: saturate(1.08) contrast(1.03);
+    opacity: 0.9;
+    transform: scale(1.045);
+  }
+
+  @keyframes magazine-card-enter {
+    from {
+      opacity: 0;
+      transform: translateY(28px) scale(0.985);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .magazine-card,
+    .magazine-image,
+    .magazine-cover {
+      animation: none;
+      transition: none;
+    }
+
+    .magazine-card:hover .magazine-image,
+    .magazine-card:hover .magazine-cover {
+      filter: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
