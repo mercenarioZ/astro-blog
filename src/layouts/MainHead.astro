@@ -1,5 +1,7 @@
 ---
 import "../../styles/global.css";
+import { ClientRouter } from "astro:transitions";
+
 const { title, description, image = "/posts/lmk-81.jpg" } = Astro.props;
 ---
 
@@ -13,6 +15,7 @@ const { title, description, image = "/posts/lmk-81.jpg" } = Astro.props;
   name="viewport"
   content="width=device-width,initial-scale=1"
 />
+<ClientRouter />
 
 <link
   rel="icon"

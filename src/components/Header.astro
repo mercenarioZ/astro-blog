@@ -4,7 +4,12 @@ import { IoLogoGithub } from "react-icons/io5";
 import ThemeToggle from "./ThemeToggleBtn";
 ---
 
-<header class="fixed w-full p-2 z-20 backdrop-blur-md">
+<header
+  transition:name="site-header"
+  transition:animate="none"
+  transition:persist
+  class="fixed w-full p-2 z-20 backdrop-blur-md"
+>
   <div class="mx-auto max-w-3xl">
     <nav class="flex items-center gap-8 text-base">
       <a

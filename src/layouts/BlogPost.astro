@@ -86,7 +86,7 @@ const formattedDate = (dateStr: string) => {
 
   <main class="pt-[50px]">
     <Content className="markdown-body pt-4">
-      <div class="mb-6 flex justify-center">
+      <div class="post-enter post-enter-hero mb-6 flex justify-center">
         {
           heroImage && (
             <div class="w-full max-w-[720px] h-auto rounded-xl border border-slate-400 dark:border-zinc-700 shadow-xl bg-slate-100 dark:bg-zinc-800/60 overflow-hidden">
@@ -102,20 +102,82 @@ const formattedDate = (dateStr: string) => {
         }
       </div>
 
-      <div class="opacity-75">
+      <div class="post-enter post-enter-meta opacity-75">
         {createdAt && <p>{formattedDate(createdAt)}</p>}
       </div>
 
-      <div class="mb-4 flex flex-col items-center">
+      <div class="post-enter post-enter-title mb-4 flex flex-col items-center">
         <h1 class="font-bold text-3xl mb-4">{title}</h1>
         <div class="opacity-75">{description}</div>
       </div>
 
       <!-- <hr class="my-4 border-top border-zinc-600" /> -->
-      <div class="indent-4 pt-4 ">
+      <div class="post-enter post-enter-content indent-4 pt-4 ">
         <slot />
       </div>
     </Content>
   </main>
   <Footer />
 </Body>
+
+<style>
+  .post-enter {
+    animation: post-enter 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: opacity, transform, filter;
+  }
+
+  .post-enter-hero {
+    animation-delay: 40ms;
+  }
+
+  .post-enter-meta {
+    animation-delay: 180ms;
+  }
+
+  .post-enter-title {
+    animation-delay: 260ms;
+  }
+
+  .post-enter-content {
+    animation-delay: 380ms;
+  }
+
+  .post-enter-hero img {
+    animation: post-image-settle 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: center;
+  }
+
+  @keyframes post-enter {
+    from {
+      filter: blur(8px);
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      filter: blur(0);
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes post-image-settle {
+    from {
+      transform: scale(1.045);
+    }
+
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .post-enter,
+    .post-enter-hero img {
+      animation: none;
+      filter: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
