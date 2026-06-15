@@ -32,6 +32,7 @@ posts.sort(
 );
 
 const [featuredPost, ...secondaryPosts] = posts;
+const remainingPosts = secondaryPosts.slice(2);
 
 const postDateFormatter = new Intl.DateTimeFormat("en", {
   day: "2-digit",
@@ -158,6 +159,52 @@ const getPostDate = (post: PostModule) =>
             )
           }
         </div>
+
+        {
+          remainingPosts.length > 0 && (
+            <section class="mt-16 border-t border-slate-300 pt-10 dark:border-zinc-700">
+              <div class="mb-8 flex items-center justify-between gap-6">
+                <h2 class="text-2xl font-bold leading-tight">Latest</h2>
+                <span class="text-sm font-medium opacity-60">
+                  {remainingPosts.length} more
+                </span>
+              </div>
+
+              <ul class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {remainingPosts.map((post, index) => (
+                  <li
+                    class="magazine-card"
+                    style={`animation-delay: ${300 + index * 80}ms`}
+                  >
+                    <a href={post.url} class="group block">
+                      <figure class="magazine-image mb-4 aspect-[1.55/1] w-full overflow-hidden border border-slate-400 dark:border-zinc-700">
+                        <Image
+                          width={420}
+                          height={420 / 1.55}
+                          src={post.frontmatter.heroImage}
+                          alt={post.frontmatter.title}
+                          class="magazine-cover h-full w-full object-cover"
+                        />
+                      </figure>
+                      <div class="mb-2 text-xs font-semibold uppercase text-orange-500">
+                        {getPostTag(post)}
+                      </div>
+                      <h2 class="text-lg font-bold leading-tight">
+                        {post.frontmatter.title}
+                      </h2>
+                      <p class="mt-2 text-sm opacity-80">
+                        {post.frontmatter.description}
+                      </p>
+                      <p class="mt-3 text-xs font-medium opacity-60">
+                        {getPostDate(post)}
+                      </p>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
       </section>
     </Content>
   </main>
