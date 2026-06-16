@@ -1,6 +1,6 @@
 ---
 import HeaderLink from "./HeaderLink.astro";
-import { IoLogoGithub } from "react-icons/io5";
+import { IoClose, IoLogoGithub, IoMenu } from "react-icons/io5";
 import ThemeToggle from "./ThemeToggleBtn";
 ---
 
@@ -8,16 +8,16 @@ import ThemeToggle from "./ThemeToggleBtn";
   transition:name="site-header"
   transition:animate="none"
   transition:persist
-  class="fixed w-full p-2 z-20 backdrop-blur-md"
+  class="fixed w-full px-7 py-3 z-20 backdrop-blur-md md:px-2 md:py-2"
 >
   <div class="mx-auto max-w-3xl">
-    <nav class="flex items-center gap-8 text-base">
+    <nav class="flex items-center gap-4 text-base md:gap-8">
       <a
         href="/"
         class="group"
       >
         <h2
-          class="font-bold text-xl hover:-translate-y-1 transition duration-500 hover:underline"
+          class="font-bold text-xl hover:-translate-y-0.5 transition duration-400 hover:underline"
         >
           MercenarioZ
         </h2>
@@ -31,7 +31,96 @@ import ThemeToggle from "./ThemeToggleBtn";
       </div>
       <div class="flex-1"></div>
 
+      <div
+        class="relative md:hidden"
+        data-mobile-nav
+      >
+        <button
+          type="button"
+          class="inline-flex size-9 items-center justify-center rounded-full bg-slate-200 text-xl transition hover:bg-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 dark:bg-zinc-700 dark:hover:bg-zinc-600"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+          aria-controls="mobile-nav-menu"
+          data-mobile-nav-button
+        >
+          <span data-mobile-nav-open>
+            <IoMenu />
+          </span>
+          <span
+            class="hidden"
+            data-mobile-nav-close
+          >
+            <IoClose />
+          </span>
+        </button>
+
+        <div
+          id="mobile-nav-menu"
+          class="absolute right-0 top-full mt-3 hidden w-44 rounded-lg border border-slate-200 bg-white p-2 shadow-lg dark:border-zinc-700 dark:bg-zinc-900"
+          data-mobile-nav-menu
+        >
+          <div class="flex flex-col gap-1">
+            <HeaderLink
+              href="/about"
+              class="rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-zinc-800"
+            >
+              About
+            </HeaderLink>
+            <HeaderLink
+              target="_blank"
+              href="https://github.com/mercenarioZ"
+              class="rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-zinc-800"
+            >
+              <IoLogoGithub /> GitHub
+            </HeaderLink>
+          </div>
+        </div>
+      </div>
+
       <ThemeToggle client:load />
     </nav>
   </div>
 </header>
+
+<script>
+  const setupMobileNav = () => {
+    const nav = document.querySelector("[data-mobile-nav]");
+    const button = nav?.querySelector("[data-mobile-nav-button]");
+    const menu = nav?.querySelector("[data-mobile-nav-menu]");
+    const openIcon = nav?.querySelector("[data-mobile-nav-open]");
+    const closeIcon = nav?.querySelector("[data-mobile-nav-close]");
+
+    if (!nav || !button || !menu || !openIcon || !closeIcon) return;
+
+    const setOpen = (isOpen: boolean) => {
+      button.setAttribute("aria-expanded", String(isOpen));
+      button.setAttribute(
+        "aria-label",
+        isOpen ? "Close navigation menu" : "Open navigation menu",
+      );
+      menu.classList.toggle("hidden", !isOpen);
+      openIcon.classList.toggle("hidden", isOpen);
+      closeIcon.classList.toggle("hidden", !isOpen);
+    };
+
+    button.addEventListener("click", () => {
+      setOpen(button.getAttribute("aria-expanded") !== "true");
+    });
+
+    menu.addEventListener("click", (event) => {
+      if ((event.target as Element).closest("a")) setOpen(false);
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!nav.contains(event.target as Node)) setOpen(false);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setOpen(false);
+    });
+
+    document.addEventListener("astro:before-swap", () => setOpen(false));
+  };
+
+  setupMobileNav();
+</script>
