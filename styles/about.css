@@ -97,6 +97,10 @@
   padding-top: 16px;
 }
 
+.about-timeline-item-plain {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .about-timeline-dot {
   width: 10px;
   height: 10px;
