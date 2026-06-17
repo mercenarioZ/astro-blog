@@ -88,15 +88,9 @@ export const aboutWorkExperience = [
   },
   {
     period: "May 2023 - Nov 2023",
-    title: "Company 2",
+    title: "VNPT",
     place: "Ho Chi Minh City",
-    body: "Placeholder for API design, persistence, authentication, logging, and deployment details.",
-  },
-  {
-    period: "Placeholder",
-    title: "Android Companion App",
-    place: "Personal project",
-    body: "Placeholder for Kotlin, Jetpack Compose, offline state, and mobile-first utility flows.",
+    body: "Build web app with ASP.NET to monitor networking devices (switch, router, etc)",
   },
 ];
 
