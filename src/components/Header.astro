@@ -83,6 +83,27 @@ import ThemeToggle from "./ThemeToggleBtn";
 </header>
 
 <script>
+  const normalizePath = (path: string) => path.replace(/\/$/, "") || "/";
+
+  const updateActiveNavLinks = () => {
+    const currentPath = normalizePath(window.location.pathname);
+
+    document
+      .querySelectorAll<HTMLAnchorElement>("[data-nav-link]")
+      .forEach((link) => {
+        const linkPath = normalizePath(new URL(link.href).pathname);
+        const isActive = linkPath === currentPath;
+
+        link.classList.toggle("active", isActive);
+
+        if (isActive) {
+          link.setAttribute("aria-current", "page");
+        } else {
+          link.removeAttribute("aria-current");
+        }
+      });
+  };
+
   const setupMobileNav = () => {
     const nav = document.querySelector("[data-mobile-nav]");
     const button = nav?.querySelector("[data-mobile-nav-button]");
@@ -123,4 +144,7 @@ import ThemeToggle from "./ThemeToggleBtn";
   };
 
   setupMobileNav();
+  updateActiveNavLinks();
+
+  document.addEventListener("astro:page-load", updateActiveNavLinks);
 </script>

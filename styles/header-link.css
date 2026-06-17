@@ -1,0 +1,13 @@
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-link.active {
+  color: orange;
+  font-weight: bolder;
+  text-decoration: underline;
+}

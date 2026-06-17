@@ -1,28 +1,20 @@
 ---
+import "../../styles/header-link.css";
+
 export interface Props extends astroHTML.JSX.AnchorHTMLAttributes {}
 
 const { href, class: className, ...props } = Astro.props;
-const isActive = href === Astro.url.pathname.replace(/\/$/, "");
+const normalizePath = (path: string) => path.replace(/\/$/, "") || "/";
+const isActive =
+  typeof href === "string" &&
+  href.startsWith("/") &&
+  normalizePath(href) === normalizePath(Astro.url.pathname);
 ---
 
 <a
   href={href}
-  class:list={[className, { active: isActive }]}
+  class:list={["nav-link", className, { active: isActive }]}
+  aria-current={isActive ? "page" : undefined}
+  data-nav-link
   {...props}
 ><slot /></a>
-
-<style>
-  a {
-    display: inline-flex;
-    text-decoration: none;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-  }
-
-  a.active {
-    font-weight: bolder;
-    text-decoration: underline;
-    color: orange;
-  }
-</style>
