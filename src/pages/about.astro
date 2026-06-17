@@ -1,9 +1,14 @@
 ---
+import Content from "../components/Content.astro";
 import Header from "../components/Header.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 ---
 
 <MainLayout title="About">
   <Header />
-  <h1 class="text-center pt-[50px]">I will implement it later</h1>
+  <main class="pt-24 md:pt-28">
+    <Content className="text-center">
+      <h1 class="text-2xl font-bold">I will implement it later</h1>
+    </Content>
+  </main>
 </MainLayout>
