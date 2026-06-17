@@ -1,14 +1,177 @@
 ---
+import "../../styles/about.css";
 import Content from "../components/Content.astro";
 import Header from "../components/Header.astro";
 import MainLayout from "../layouts/MainLayout.astro";
+import {
+  aboutCapabilityRows,
+  aboutFragments,
+  aboutHero,
+  aboutLinks,
+  aboutPrinciples,
+} from "../constants/about";
+import {
+  IoCloudOutline,
+  IoCodeSlash,
+  IoLogoGithub,
+  IoLogoInstagram,
+  IoLogoNodejs,
+  IoLogoReact,
+  IoRadioOutline,
+  IoServerOutline,
+  IoTerminalOutline,
+} from "react-icons/io5";
+import {
+  SiAmazonec2,
+  SiAstro,
+  SiTailwindcss,
+  SiTypescript,
+} from "react-icons/si";
+
+const capabilityIcons = {
+  astro: SiAstro,
+  react: IoLogoReact,
+  typescript: SiTypescript,
+  tailwind: SiTailwindcss,
+  node: IoLogoNodejs,
+  terminal: IoTerminalOutline,
+  ec2: SiAmazonec2,
+  server: IoServerOutline,
+  cloud: IoCloudOutline,
+};
 ---
 
 <MainLayout title="About">
   <Header />
-  <main class="pt-24 md:pt-28">
-    <Content className="text-center">
-      <h1 class="text-2xl font-bold">I will implement it later</h1>
+  <main class="about-grid min-h-screen pt-24 md:pt-28">
+    <Content className="max-w-5xl pb-20">
+      <section class="about-panel overflow-hidden rounded-lg">
+        <div class="grid gap-10 p-6 md:grid-cols-[1.35fr_0.65fr] md:p-10">
+          <div>
+            <div class="about-kicker rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em]">
+              <IoRadioOutline />
+              {aboutHero.kicker}
+            </div>
+
+            <h1 class="mt-8 max-w-3xl text-4xl font-black leading-none md:text-6xl">
+              {aboutHero.title}
+            </h1>
+
+            <p class="mt-6 max-w-2xl text-lg leading-8 opacity-75">
+              {aboutHero.description}
+            </p>
+
+            <div class="mt-8 flex flex-wrap gap-3">
+              <a
+                href={aboutLinks.github}
+                target="_blank"
+                class="about-link inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
+              >
+                <IoLogoGithub />
+                GitHub
+              </a>
+              <a
+                href={aboutLinks.instagram}
+                target="_blank"
+                class="about-link inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
+              >
+                <IoLogoInstagram />
+                Instagram
+              </a>
+            </div>
+          </div>
+
+          <aside class="flex flex-col justify-between gap-8 border-t border-slate-300 pt-8 dark:border-zinc-700 md:border-t-0 md:border-l md:pl-8 md:pt-0">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.18em] text-orange-500">
+                Current mode
+              </p>
+              <p class="mt-4 text-2xl font-black leading-tight">
+                {aboutHero.mode}
+              </p>
+            </div>
+
+            <div class="about-rule"></div>
+
+            <div class="space-y-5 text-sm opacity-65">
+              {
+                aboutFragments.map((fragment) => (
+                  <p class="border-l-2 border-teal-500/70 pl-3">{fragment}</p>
+                ))
+              }
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="mt-10 grid gap-4 md:grid-cols-3">
+        {
+          aboutPrinciples.map((principle, index) => (
+            <article class="about-card rounded-lg p-5">
+              <div class="about-index text-sm font-black">
+                0{index + 1}
+              </div>
+              <h2 class="mt-5 text-xl font-black leading-tight">
+                {principle.title}
+              </h2>
+              <p class="mt-3 text-sm leading-6 opacity-75">{principle.body}</p>
+            </article>
+          ))
+        }
+      </section>
+
+      <section class="mt-10 grid min-w-0 gap-6 border-y border-slate-300 py-8 dark:border-zinc-700 md:grid-cols-[0.7fr_1.3fr]">
+        <div>
+          <div class="inline-flex size-11 items-center justify-center rounded-full bg-orange-500 text-xl text-white dark:text-zinc-950">
+            <IoCodeSlash />
+          </div>
+          <h2 class="mt-5 text-2xl font-black">Working vocabulary</h2>
+        </div>
+
+        <div class="min-w-0 space-y-5">
+          {
+            aboutCapabilityRows.map((row, rowIndex) => {
+              const loopItems = [...row.items, ...row.items];
+
+              return (
+                <div>
+                  <p class="mb-2 text-xs font-black uppercase tracking-[0.18em] text-orange-500">
+                    {row.label}
+                  </p>
+                  <div
+                    class:list={[
+                      "about-vocab-marquee",
+                      { "about-vocab-marquee-reverse": rowIndex % 2 === 1 },
+                    ]}
+                    aria-label={`${row.label} vocabulary`}
+                  >
+                    <div class="about-vocab-track">
+                      {[...loopItems, ...loopItems].map((capability) => {
+                        const Icon = capabilityIcons[capability.icon];
+
+                        return (
+                          <span
+                            class="about-vocab-item"
+                            aria-label={capability.label}
+                            tabindex="0"
+                          >
+                            <span class="about-vocab-icon" aria-hidden="true">
+                              <Icon />
+                            </span>
+                            <span class="about-vocab-label">
+                              {capability.label}
+                            </span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          }
+        </div>
+      </section>
     </Content>
   </main>
 </MainLayout>
