@@ -5,10 +5,12 @@ import Header from "../components/Header.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 import {
   aboutCapabilityRows,
+  aboutEducation,
   aboutFragments,
   aboutHero,
   aboutLinks,
   aboutPrinciples,
+  aboutWorkExperience,
 } from "../constants/about";
 import {
   IoCodeSlash,
@@ -110,7 +112,7 @@ const capabilityIcons = {
             <div class="space-y-5 text-sm opacity-65">
               {
                 aboutFragments.map((fragment) => (
-                  <p class="border-l-2 border-teal-500/70 pl-3">{fragment}</p>
+                  <p class="border-l-2 border-emerald-500/70 pl-3">{fragment}</p>
                 ))
               }
             </div>
@@ -186,6 +188,82 @@ const capabilityIcons = {
               );
             })
           }
+        </div>
+      </section>
+
+      <section class="mt-10 grid items-start gap-6 md:grid-cols-2">
+        <div class="about-stack-section">
+          <p class="about-section-kicker">Education</p>
+          <div class="mt-5 space-y-4">
+            {
+              aboutEducation.map((entry) => (
+                <article class="about-timeline-item">
+                  <div class="about-timeline-dot"></div>
+                  <div class="min-w-0">
+                    <div class="about-entry-header">
+                      <div class="min-w-0">
+                        <h2 class="text-xl font-black leading-tight">
+                          {entry.title}
+                        </h2>
+                        <p class="mt-1 text-sm font-bold text-orange-600 dark:text-orange-400">
+                          {entry.place}
+                        </p>
+                      </div>
+                      <div class="about-entry-meta">
+                        <span class="text-xs font-black uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-400">
+                          {entry.period}
+                        </span>
+                        {
+                          "image" in entry && (
+                          <div class="about-entry-logo">
+                            <img
+                              src={entry.image}
+                              alt={entry.imageAlt}
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </div>
+                          )
+                        }
+                      </div>
+                    </div>
+                    <p class="mt-3 text-sm leading-6 opacity-75">
+                      {entry.body}
+                    </p>
+                  </div>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="about-stack-section">
+          <p class="about-section-kicker">Work Experience</p>
+          <div class="mt-5 space-y-4">
+            {
+              aboutWorkExperience.map((entry) => (
+                <article class="about-timeline-item">
+                  <div class="about-timeline-dot"></div>
+                  <div>
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                      <h2 class="text-xl font-black leading-tight">
+                        {entry.title}
+                      </h2>
+                      <span class="text-xs font-black uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-400">
+                        {entry.period}
+                      </span>
+                    </div>
+                    <p class="mt-1 text-sm font-bold text-orange-600 dark:text-orange-400">
+                      {entry.place}
+                    </p>
+                    <p class="mt-3 text-sm leading-6 opacity-75">
+                      {entry.body}
+                    </p>
+                  </div>
+                </article>
+              ))
+            }
+          </div>
         </div>
       </section>
     </Content>

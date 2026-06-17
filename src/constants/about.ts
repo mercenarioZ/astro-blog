@@ -5,7 +5,7 @@ export const aboutHero = {
   title: "Le Ba Nguyen Vu (MercenarioZ) builds quiet things for loud little obsessions.",
   description:
     "Software-leaning maker, blog keeper, and interface minimalist. I care about pages that load quickly, typography that behaves, and software that feels like it was tuned by someone who actually uses it.",
-  mode: "Tasteful, fast, slightly obsessive.",
+  mode: "Learning architecture. Building productivity utilities.",
 };
 
 export const aboutLinks = {
@@ -66,4 +66,36 @@ export const aboutFragments = [
   "Backend services built to be boring, observable, and easy to recover",
   "Learning infrastructure by shipping small systems end to end",
   "AWS EC2 experiments, Linux servers, deployment scripts, and logs",
+];
+
+export const aboutEducation = [
+  {
+    period: "Oct 2020 - Apr 2025",
+    title: "Electronics and Telecommunications Engineering",
+    place: "Ho Chi Minh City University of Technologies",
+    body: "Placeholder for major, coursework, academic projects, and architecture fundamentals.",
+    image: "/images/HCMUT_official_logo.png",
+    imageAlt: "HCMUT official logo",
+  },
+];
+
+export const aboutWorkExperience = [
+  {
+    period: "Sep 2025 - Present",
+    title: "Cigro",
+    place: "Ho Chi Minh City",
+    body: "Placeholder for a tool that improves daily workflow, captures repeated tasks, or connects UI to backend behavior.",
+  },
+  {
+    period: "May 2023 - Nov 2023",
+    title: "Company 2",
+    place: "Ho Chi Minh City",
+    body: "Placeholder for API design, persistence, authentication, logging, and deployment details.",
+  },
+  {
+    period: "Placeholder",
+    title: "Android Companion App",
+    place: "Personal project",
+    body: "Placeholder for Kotlin, Jetpack Compose, offline state, and mobile-first utility flows.",
+  },
 ];

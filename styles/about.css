@@ -43,7 +43,7 @@
     90deg,
     transparent,
     rgb(249 115 22 / 0.8),
-    rgb(20 184 166 / 0.55),
+    rgb(16 185 129 / 0.58),
     transparent
   );
 }
@@ -68,8 +68,108 @@
   background: rgb(39 39 42 / 0.48);
 }
 
+.about-stack-section {
+  border: 1px solid rgb(148 163 184 / 0.72);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.42);
+  padding: 20px;
+}
+
+:where(.dark) .about-stack-section {
+  border-color: rgb(82 82 91 / 0.9);
+  background: rgb(39 39 42 / 0.42);
+}
+
+.about-section-kicker {
+  color: rgb(249 115 22);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.about-timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 14px minmax(0, 1fr);
+  gap: 14px;
+  border-top: 1px solid rgb(148 163 184 / 0.52);
+  padding-top: 16px;
+}
+
+.about-timeline-dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: rgb(148 163 184);
+  box-shadow: 0 0 0 5px rgb(148 163 184 / 0.12);
+}
+
+.about-timeline-item:first-child .about-timeline-dot {
+  background: rgb(16 185 129);
+  box-shadow:
+    0 0 0 5px rgb(16 185 129 / 0.16),
+    0 0 18px rgb(16 185 129 / 0.32);
+}
+
+.about-entry-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.about-entry-meta {
+  display: flex;
+  min-width: 86px;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  text-align: right;
+}
+
+.about-entry-logo {
+  display: flex;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(148 163 184 / 0.58);
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.72);
+  padding: 8px;
+}
+
+.about-entry-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+:where(.dark) .about-entry-logo {
+  border-color: rgb(82 82 91 / 0.9);
+  background: rgb(244 244 245 / 0.9);
+}
+
+@media (max-width: 420px) {
+  .about-entry-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .about-entry-meta {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .about-entry-logo {
+    order: -1;
+  }
+}
+
 .about-index {
-  color: rgb(20 184 166);
+  color: rgb(16 185 129);
   font-variant-numeric: tabular-nums;
 }
 
@@ -104,13 +204,11 @@
   min-width: 0;
   overflow: hidden;
   padding-block: 4px;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    black 12%,
-    black 88%,
-    transparent
-  );
+  mask-image: linear-gradient(90deg,
+      transparent,
+      black 12%,
+      black 88%,
+      transparent);
 }
 
 .about-vocab-track {
