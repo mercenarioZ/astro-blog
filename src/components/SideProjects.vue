@@ -46,6 +46,7 @@ const projectCountLabel = computed(
           </h3>
           <span class="about-project-status">{{ project.status }}</span>
         </div>
+
         <p class="mt-4 text-sm leading-6 opacity-75">
           {{ project.body }}
         </p>
@@ -56,6 +57,7 @@ const projectCountLabel = computed(
         >
           Read post
         </a>
+
         <div class="mt-5 flex flex-wrap gap-2">
           <span
             v-for="item in project.stack"
