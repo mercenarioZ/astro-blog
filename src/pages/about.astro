@@ -11,7 +11,6 @@ import {
   aboutPrinciples,
 } from "../constants/about";
 import {
-  IoCloudOutline,
   IoCodeSlash,
   IoLogoGithub,
   IoLogoInstagram,
@@ -21,9 +20,17 @@ import {
   IoServerOutline,
   IoTerminalOutline,
 } from "react-icons/io5";
+import { FaJava } from "react-icons/fa";
 import {
+  SiAndroid,
   SiAmazonec2,
   SiAstro,
+  SiDocker,
+  SiKotlin,
+  SiLinux,
+  SiMongodb,
+  SiPostgresql,
+  SiSpringboot,
   SiTailwindcss,
   SiTypescript,
 } from "react-icons/si";
@@ -32,12 +39,19 @@ const capabilityIcons = {
   astro: SiAstro,
   react: IoLogoReact,
   typescript: SiTypescript,
+  java: FaJava,
+  kotlin: SiKotlin,
+  android: SiAndroid,
   tailwind: SiTailwindcss,
   node: IoLogoNodejs,
+  springboot: SiSpringboot,
   terminal: IoTerminalOutline,
   ec2: SiAmazonec2,
+  linux: SiLinux,
+  docker: SiDocker,
+  postgresql: SiPostgresql,
+  mongodb: SiMongodb,
   server: IoServerOutline,
-  cloud: IoCloudOutline,
 };
 ---
 
@@ -159,7 +173,9 @@ const capabilityIcons = {
                               <Icon />
                             </span>
                             <span class="about-vocab-label">
-                              {capability.label}
+                              {"shortLabel" in capability
+                                ? capability.shortLabel
+                                : capability.label}
                             </span>
                           </span>
                         );

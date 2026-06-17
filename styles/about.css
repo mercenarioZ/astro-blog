@@ -179,14 +179,17 @@
   color: rgb(194 65 12);
   font-size: 10px;
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.1;
+  max-width: calc(100% - 14px);
   opacity: 0;
+  overflow-wrap: anywhere;
   pointer-events: none;
   text-align: center;
   transform: translateY(6px);
   transition:
     opacity 160ms ease,
     transform 160ms ease;
+  word-break: normal;
 }
 
 .about-vocab-item:hover .about-vocab-icon,

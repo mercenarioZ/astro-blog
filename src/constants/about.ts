@@ -30,22 +30,33 @@ export const aboutPrinciples = [
 
 export const aboutCapabilityRows = [
   {
-    label: "Languages",
+    label: "Language / UI",
     items: [
       { label: "TypeScript", icon: "typescript" },
+      { label: "Java", icon: "java" },
+      { label: "Kotlin", icon: "kotlin" },
       { label: "React", icon: "react" },
+      { label: "Jetpack Compose", icon: "android" },
       { label: "Astro", icon: "astro" },
       { label: "Tailwind CSS", icon: "tailwind" },
     ],
   },
   {
-    label: "Infrastructure",
+    label: "Backend / Tooling",
     items: [
       { label: "Node.js", icon: "node" },
+      { label: "Spring Boot", icon: "springboot" },
       { label: "Terminal", icon: "terminal" },
+    ],
+  },
+  {
+    label: "Infrastructure / Data",
+    items: [
       { label: "AWS EC2", icon: "ec2" },
-      { label: "Backend services", icon: "server" },
-      { label: "Cloud platforms", icon: "cloud" },
+      { label: "Linux", icon: "linux" },
+      { label: "Docker", icon: "docker" },
+      { label: "PostgreSQL", icon: "postgresql" },
+      { label: "MongoDB", icon: "mongodb" },
     ],
   },
 ] as const;
