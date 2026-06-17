@@ -2,6 +2,7 @@
 import "../../styles/about.css";
 import Content from "../components/Content.astro";
 import Header from "../components/Header.astro";
+import SideProjects from "../components/SideProjects.vue";
 import MainLayout from "../layouts/MainLayout.astro";
 import {
   aboutCapabilityRows,
@@ -10,6 +11,7 @@ import {
   aboutHero,
   aboutLinks,
   aboutPrinciples,
+  aboutSideProjects,
   aboutWorkExperience,
 } from "../constants/about";
 import {
@@ -269,6 +271,8 @@ const capabilityIcons = {
           </div>
         </div>
       </section>
+
+      <SideProjects projects={aboutSideProjects} />
     </Content>
 
     <div

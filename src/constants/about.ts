@@ -99,3 +99,19 @@ export const aboutWorkExperience = [
     body: "Placeholder for Kotlin, Jetpack Compose, offline state, and mobile-first utility flows.",
   },
 ];
+
+export const aboutSideProjects = [
+  {
+    title: "Astro Blog & Portfolio",
+    status: "Live",
+    href: "/posts/astro-blog",
+    body: "Personal writing space built around fast static pages, plain content files, and a design system that stays small enough to maintain.",
+    stack: ["Astro", "TypeScript", "Tailwind CSS"],
+  },
+  {
+    title: "Routine Tracker",
+    status: "In progress",
+    body: "A small mobile-first utility app that tracks routines and reminders, and helps you stay on track.",
+    stack: ["Kotlin", "Jetpack Compose", "Spring Boot"],
+  }
+];

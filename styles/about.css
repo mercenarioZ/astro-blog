@@ -153,6 +153,71 @@
   background: rgb(244 244 245 / 0.9);
 }
 
+.about-project-card {
+  min-width: 0;
+  border: 1px solid rgb(148 163 184 / 0.58);
+  border-radius: 8px;
+  background: rgb(255 247 237 / 0.38);
+  padding: 18px;
+}
+
+:where(.dark) .about-project-card {
+  border-color: rgb(82 82 91 / 0.82);
+  background: rgb(24 24 27 / 0.36);
+}
+
+.about-project-status {
+  flex: 0 0 auto;
+  border: 1px solid rgb(16 185 129 / 0.35);
+  border-radius: 999px;
+  background: rgb(16 185 129 / 0.1);
+  color: rgb(4 120 87);
+  padding: 4px 8px;
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+:where(.dark) .about-project-status {
+  color: rgb(52 211 153);
+}
+
+.about-project-chip {
+  border: 1px solid rgb(249 115 22 / 0.28);
+  border-radius: 999px;
+  background: rgb(249 115 22 / 0.08);
+  color: rgb(194 65 12);
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+:where(.dark) .about-project-chip {
+  color: rgb(251 146 60);
+}
+
+.about-project-link {
+  display: inline-flex;
+  margin-top: 16px;
+  color: rgb(194 65 12);
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration-line: underline;
+  text-decoration-color: rgb(249 115 22 / 0.55);
+  text-underline-offset: 3px;
+}
+
+.about-project-link:hover {
+  color: rgb(249 115 22);
+}
+
+:where(.dark) .about-project-link {
+  color: rgb(251 146 60);
+}
+
 @media (max-width: 420px) {
   .about-entry-header {
     grid-template-columns: minmax(0, 1fr);
