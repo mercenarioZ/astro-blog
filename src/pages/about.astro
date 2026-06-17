@@ -120,7 +120,10 @@ const capabilityIcons = {
         </div>
       </section>
 
-      <section class="mt-10 grid gap-4 md:grid-cols-3">
+      <section
+        id="about-details"
+        class="mt-10 grid scroll-mt-24 gap-4 md:grid-cols-3"
+      >
         {
           aboutPrinciples.map((principle, index) => (
             <article class="about-card rounded-lg p-5">
@@ -267,5 +270,51 @@ const capabilityIcons = {
         </div>
       </section>
     </Content>
+
+    <div
+      class="scroll-indicator"
+      aria-hidden="true"
+      data-scroll-indicator
+    >
+      <span class="scroll-indicator__text">Scroll</span>
+      <span
+        class="scroll-indicator__mouse"
+        aria-hidden="true"
+      >
+        <span class="scroll-indicator__wheel"></span>
+      </span>
+    </div>
   </main>
 </MainLayout>
+
+<script>
+  const setupScrollIndicator = () => {
+    const indicator = document.querySelector<HTMLElement>(
+      "[data-scroll-indicator]",
+    );
+
+    if (!indicator) return;
+    if (indicator.dataset.scrollIndicatorReady === "true") return;
+
+    indicator.dataset.scrollIndicatorReady = "true";
+
+    const updateVisibility = () => {
+      const canScroll =
+        document.documentElement.scrollHeight > window.innerHeight + 80;
+      const scrollBottom = window.scrollY + window.innerHeight;
+      const isAtEnd = scrollBottom >= document.documentElement.scrollHeight - 80;
+
+      indicator.classList.toggle(
+        "scroll-indicator--hidden",
+        !canScroll || isAtEnd,
+      );
+    };
+
+    updateVisibility();
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    window.addEventListener("resize", updateVisibility);
+  };
+
+  setupScrollIndicator();
+  document.addEventListener("astro:page-load", setupScrollIndicator);
+</script>
