@@ -1,0 +1,152 @@
+@reference "./global.css";
+
+main article.markdown-body {
+  ul {
+    @apply list-disc list-inside pl-4 mb-4;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    @apply font-bold;
+  }
+
+  h1 {
+    @apply text-4xl mb-2;
+  }
+
+  h2 {
+    @apply mt-10 mb-4 text-3xl;
+  }
+
+  h3 {
+    @apply mt-8 mb-3 text-2xl;
+  }
+
+  h4 {
+    @apply text-xl;
+  }
+
+  img {
+    @apply rounded-lg shadow-xl border border-slate-300 dark:border-zinc-700 mb-4;
+  }
+
+  p {
+    @apply mb-4;
+  }
+
+  :not(pre) > code {
+    @apply rounded bg-slate-200 px-1.5 py-0.5 text-sm text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100;
+  }
+
+  pre {
+    @apply mb-6 overflow-x-auto rounded-lg border border-slate-300 bg-zinc-950 p-4 text-sm text-zinc-100 shadow-xl dark:border-zinc-700;
+  }
+
+  pre code {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  table {
+    @apply mb-6 w-full border-collapse overflow-hidden rounded-lg border border-slate-300 text-left text-sm shadow-lg dark:border-zinc-700;
+  }
+
+  thead {
+    @apply bg-slate-200 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100;
+  }
+
+  th,
+  td {
+    @apply border-b border-slate-300 px-4 py-3 align-top dark:border-zinc-700;
+  }
+
+  th {
+    @apply font-bold;
+  }
+
+  tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  tbody tr {
+    @apply bg-white/45 dark:bg-zinc-900/45;
+  }
+
+  tbody tr:nth-child(even) {
+    @apply bg-slate-100/70 dark:bg-zinc-800/35;
+  }
+
+  td:first-child {
+    @apply w-32 whitespace-nowrap font-medium;
+  }
+
+  a {
+    @apply text-orange-500 hover:text-orange-300 transition underline underline-offset-2 decoration-orange-400;
+  }
+}
+
+.post-enter {
+  animation: post-enter 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform, filter;
+}
+
+.post-enter-hero {
+  animation-delay: 40ms;
+}
+
+.post-enter-meta {
+  animation-delay: 180ms;
+}
+
+.post-date {
+  opacity: 0.45;
+}
+
+.post-enter-title {
+  animation-delay: 260ms;
+}
+
+.post-enter-content {
+  animation-delay: 380ms;
+}
+
+.post-enter-hero img {
+  animation: post-image-settle 1100ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center;
+}
+
+@keyframes post-enter {
+  from {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes post-image-settle {
+  from {
+    transform: scale(1.045);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-enter,
+  .post-enter-hero img {
+    animation: none;
+    filter: none;
+    opacity: 1;
+    transform: none;
+  }
+}
