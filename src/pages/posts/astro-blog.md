@@ -18,8 +18,8 @@ Current shape:
 - Markdown posts live in `src/pages/posts`.
 - `BlogPost.astro` wraps each post in the same layout.
 - `index.astro` reads post modules with `import.meta.glob`.
-- React is used for the theme toggle.
-- Vue is used for the side-project cards on the About page.
+- React and Vue are optional islands, not the foundation of the site.
+- Most of the page is still Astro-rendered HTML.
 
 ## Under the hood
 
@@ -59,7 +59,9 @@ Then it sorts by `createdAt`, picks a featured post, and renders the rest as car
 
 ## Multi-framework support
 
-Astro can run multiple UI frameworks in one project. This site currently registers React and Vue:
+Astro is not locked into React, Vue, or any other UI framework. The base layer is `.astro` files, markdown, and static HTML. Framework integrations are opt-in adapters for the components that need them.
+
+This site currently registers React and Vue:
 
 ```js
 export default defineConfig({
@@ -74,7 +76,7 @@ That means the page can use:
 <SideProjects projects={aboutSideProjects} />
 ```
 
-React owns the theme toggle because it was already written in React. Vue owns the side-project section as a learning exercise. Astro keeps both from becoming a full-page SPA.
+The important detail is that neither framework owns the page. React is used for one interactive theme toggle. Vue is used for one side-project section as a learning exercise. Either one could be replaced with Astro, Svelte, Solid, or plain browser JavaScript without rewriting the whole site.
 
 ## Hydration model
 
@@ -84,7 +86,7 @@ By default, an Astro component ships HTML only. A framework component can opt in
 <ThemeToggle client:load />
 ```
 
-That tells Astro to render the component and also ship enough React runtime code to hydrate it after page load.
+That tells Astro to render the component and also ship enough React runtime code to hydrate that one island after page load.
 
 The Vue side-project component does not need client interactivity right now, so it can render as static HTML. The component is still authored in Vue, but the browser does not need to hydrate it unless I add a directive such as `client:load`, `client:idle`, or `client:visible`.
 
@@ -94,5 +96,5 @@ The practical benefit is control:
 
 - Static content stays static.
 - Interactive UI is isolated.
-- React and Vue can coexist without forcing the whole site into one framework.
+- React and Vue can coexist without locking the whole site into either framework.
 - The final build is still a set of static routes.
