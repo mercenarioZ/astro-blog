@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="742" viewBox="0 0 1200 742" role="img" aria-labelledby="title desc">
+  <title id="title">Dino CLI terminal thumbnail</title>
+  <desc id="desc">A terminal window showing Dino CLI status messages and a generated commit message.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="0.52" stop-color="#dbeafe"/>
+      <stop offset="1" stop-color="#ccfbf1"/>
+    </linearGradient>
+    <linearGradient id="terminal" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="1" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="28" stdDeviation="34" flood-color="#0f172a" flood-opacity="0.24"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="742" fill="url(#bg)"/>
+  <path d="M0 583C132 525 252 536 393 587C546 642 677 714 828 657C967 604 1045 507 1200 548V742H0Z" fill="#0f766e" opacity="0.14"/>
+  <path d="M0 172C147 114 266 122 413 175C566 230 716 263 880 207C1010 163 1108 119 1200 146V0H0Z" fill="#2563eb" opacity="0.11"/>
+
+  <rect x="136" y="108" width="928" height="526" rx="30" fill="url(#terminal)" filter="url(#shadow)"/>
+  <rect x="136" y="108" width="928" height="72" rx="30" fill="#1f2937"/>
+  <rect x="136" y="150" width="928" height="30" fill="#1f2937"/>
+  <circle cx="184" cy="144" r="11" fill="#fb7185"/>
+  <circle cx="224" cy="144" r="11" fill="#fbbf24"/>
+  <circle cx="264" cy="144" r="11" fill="#34d399"/>
+  <text x="600" y="151" text-anchor="middle" fill="#cbd5e1" font-family="Menlo, Consolas, monospace" font-size="20">~/personal/dino-cli</text>
+
+  <text x="195" y="244" fill="#22c55e" font-family="Menlo, Consolas, monospace" font-size="30">$ dino commit</text>
+  <text x="195" y="306" fill="#93c5fd" font-family="Menlo, Consolas, monospace" font-size="24">dino: checking the diff before making any claims</text>
+  <text x="195" y="356" fill="#93c5fd" font-family="Menlo, Consolas, monospace" font-size="24">dino: using unstaged changes</text>
+  <text x="195" y="406" fill="#93c5fd" font-family="Menlo, Consolas, monospace" font-size="24">dino: asking the model for a conventional commit message</text>
+  <text x="195" y="456" fill="#93c5fd" font-family="Menlo, Consolas, monospace" font-size="24">dino: message ready</text>
+
+  <rect x="195" y="500" width="810" height="70" rx="14" fill="#f8fafc" opacity="0.08"/>
+  <text x="226" y="546" fill="#f8fafc" font-family="Menlo, Consolas, monospace" font-size="27">build(go): update module path to GitHub repo</text>
+
+</svg>
