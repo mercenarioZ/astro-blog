@@ -19,6 +19,9 @@ const props = defineProps<{
 const projectCountLabel = computed(
   () => `${props.projects.length} active threads`,
 );
+
+const statusClass = (status: string) =>
+  `about-project-status-${status.toLowerCase().replace(/\s+/g, "-")}`;
 </script>
 
 <template>
@@ -47,7 +50,9 @@ const projectCountLabel = computed(
           <h3 class="text-lg font-black leading-tight">
             {{ project.title }}
           </h3>
-          <span class="about-project-status">{{ project.status }}</span>
+          <span :class="['about-project-status', statusClass(project.status)]">
+            {{ project.status }}
+          </span>
         </div>
 
         <div

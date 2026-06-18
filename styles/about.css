@@ -199,10 +199,7 @@
 
 .about-project-status {
   flex: 0 0 auto;
-  border: 1px solid rgb(16 185 129 / 0.35);
   border-radius: 999px;
-  background: rgb(16 185 129 / 0.1);
-  color: rgb(4 120 87);
   padding: 4px 8px;
   font-size: 10px;
   font-weight: 900;
@@ -211,8 +208,34 @@
   white-space: nowrap;
 }
 
-:where(.dark) .about-project-status {
+.about-project-status-live {
+  border: 1px solid rgb(16 185 129 / 0.35);
+  background: rgb(16 185 129 / 0.1);
+  color: rgb(4 120 87);
+}
+
+:where(.dark) .about-project-status-live {
   color: rgb(52 211 153);
+}
+
+.about-project-status-in-progress {
+  border: 1px solid rgb(249 115 22 / 0.34);
+  background: rgb(249 115 22 / 0.1);
+  color: rgb(194 65 12);
+}
+
+:where(.dark) .about-project-status-in-progress {
+  color: rgb(251 146 60);
+}
+
+.about-project-status-planning {
+  border: 1px solid rgb(37 99 235 / 0.32);
+  background: rgb(37 99 235 / 0.08);
+  color: rgb(29 78 216);
+}
+
+:where(.dark) .about-project-status-planning {
+  color: rgb(96 165 250);
 }
 
 .about-project-chip {
