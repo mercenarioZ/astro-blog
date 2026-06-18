@@ -63,6 +63,7 @@ export const aboutCapabilityRows = [
 
 export const aboutFragments = [
   "Terminal workflows with too many aliases",
+  "Frontend developer trying to make niche stuff",
   "Backend services built to be boring, observable, and easy to recover",
   "Learning infrastructure by shipping small systems end to end",
   "AWS EC2 experiments, Linux servers, deployment scripts, and logs",
@@ -92,20 +93,4 @@ export const aboutWorkExperience = [
     place: "Ho Chi Minh City",
     body: "Build web app with ASP.NET to monitor networking devices (switch, router, etc)",
   },
-];
-
-export const aboutSideProjects = [
-  {
-    title: "Astro Blog & Portfolio",
-    status: "Live",
-    href: "/posts/astro-blog",
-    body: "Personal writing space built around fast static pages, plain content files, and a design system that stays small enough to maintain.",
-    stack: ["Astro", "TypeScript", "Tailwind CSS"],
-  },
-  {
-    title: "Routine Tracker",
-    status: "In progress",
-    body: "A small mobile-first utility app that tracks routines and reminders, and helps you stay on track.",
-    stack: ["Kotlin", "Jetpack Compose", "Spring Boot"],
-  }
 ];

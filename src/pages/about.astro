@@ -4,6 +4,7 @@ import Content from "../components/Content.astro";
 import Header from "../components/Header.astro";
 import SideProjects from "../components/SideProjects.vue";
 import MainLayout from "../layouts/MainLayout.astro";
+import { getCollection } from "astro:content";
 import {
   aboutCapabilityRows,
   aboutEducation,
@@ -11,7 +12,6 @@ import {
   aboutHero,
   aboutLinks,
   aboutPrinciples,
-  aboutSideProjects,
   aboutWorkExperience,
 } from "../constants/about";
 import {
@@ -57,6 +57,17 @@ const capabilityIcons = {
   mongodb: SiMongodb,
   server: IoServerOutline,
 };
+
+const sideProjectEntries = await getCollection("sideProjects");
+const aboutSideProjects = sideProjectEntries
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((project) => ({
+    title: project.data.title,
+    status: project.data.status,
+    links: project.data.links ?? [],
+    stack: project.data.stack,
+    bodyHtml: project.rendered?.html ?? project.body ?? "",
+  }));
 ---
 
 <MainLayout title="About">

@@ -170,6 +170,33 @@
   background: rgb(24 24 27 / 0.36);
 }
 
+.about-project-body {
+  margin-top: 16px;
+  font-size: 14px;
+  line-height: 1.5rem;
+  opacity: 0.75;
+}
+
+.about-project-body p + p {
+  margin-top: 10px;
+}
+
+.about-project-body strong {
+  font-weight: 900;
+}
+
+.about-project-body a {
+  color: rgb(194 65 12);
+  font-weight: 800;
+  text-decoration-line: underline;
+  text-decoration-color: rgb(249 115 22 / 0.55);
+  text-underline-offset: 3px;
+}
+
+:where(.dark) .about-project-body a {
+  color: rgb(251 146 60);
+}
+
 .about-project-status {
   flex: 0 0 auto;
   border: 1px solid rgb(16 185 129 / 0.35);
@@ -203,9 +230,15 @@
   color: rgb(251 146 60);
 }
 
+.about-project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
 .about-project-link {
   display: inline-flex;
-  margin-top: 16px;
   color: rgb(194 65 12);
   font-size: 13px;
   font-weight: 900;

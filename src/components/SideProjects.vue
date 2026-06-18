@@ -4,8 +4,11 @@ import { computed } from "vue";
 interface SideProject {
   title: string;
   status: string;
-  href?: string;
-  body: string;
+  links: Array<{
+    label: string;
+    href: string;
+  }>;
+  bodyHtml: string;
   stack: string[];
 }
 
@@ -47,16 +50,23 @@ const projectCountLabel = computed(
           <span class="about-project-status">{{ project.status }}</span>
         </div>
 
-        <p class="mt-4 text-sm leading-6 opacity-75">
-          {{ project.body }}
-        </p>
-        <a
-          v-if="project.href"
-          :href="project.href"
-          class="about-project-link"
+        <div
+          class="about-project-body"
+          v-html="project.bodyHtml"
+        ></div>
+        <div
+          v-if="project.links.length > 0"
+          class="about-project-links"
         >
-          Read post
-        </a>
+          <a
+            v-for="link in project.links"
+            :key="link.href"
+            :href="link.href"
+            class="about-project-link"
+          >
+            {{ link.label }}
+          </a>
+        </div>
 
         <div class="mt-5 flex flex-wrap gap-2">
           <span
