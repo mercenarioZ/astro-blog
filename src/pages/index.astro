@@ -20,9 +20,12 @@ interface PostModule {
 }
 
 // get all sorted posts
-const postModules = import.meta.glob<PostModule>("../pages/posts/*.md", {
-  eager: true,
-});
+const postModules = import.meta.glob<PostModule>(
+  ["../pages/posts/*.md", "../pages/posts/*.mdx"],
+  {
+    eager: true,
+  }
+);
 const posts = Object.values(postModules) as PostModule[];
 
 posts.sort(
