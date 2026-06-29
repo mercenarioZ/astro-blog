@@ -45,10 +45,16 @@ const postDateFormatter = new Intl.DateTimeFormat("en", {
   year: "numeric",
 });
 
-const getPostTag = (post: PostModule) => {
-  const tag = post.frontmatter.tags?.[0] ?? post.frontmatter.tag?.[0] ?? "Post";
-  return tag.charAt(0).toUpperCase() + tag.slice(1);
+const formatTag = (tag: string) =>
+  tag.charAt(0).toUpperCase() + tag.slice(1);
+
+const getPostTags = (post: PostModule) => {
+  const tags = post.frontmatter.tags ?? post.frontmatter.tag ?? ["Post"];
+  return tags.map(formatTag);
 };
+
+const tagBadgeClass =
+  "inline-flex rounded-full border border-orange-500/30 bg-orange-500/10 px-2 py-0.5 leading-none text-orange-600 dark:text-orange-300";
 
 const getPostDate = (post: PostModule) =>
   postDateFormatter.format(new Date(post.frontmatter.createdAt));
@@ -80,8 +86,10 @@ const getPostDate = (post: PostModule) =>
                       class="magazine-cover h-full w-full object-cover"
                     />
                   </figure>
-                  <div class="mb-3 text-xs font-semibold uppercase text-orange-500">
-                    {getPostTag(post)}
+                  <div class="mb-3 flex flex-wrap gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500">
+                    {getPostTags(post).map((tag) => (
+                      <span class={tagBadgeClass}>{tag}</span>
+                    ))}
                   </div>
                   <h2 class="text-xl font-bold leading-tight">
                     {post.frontmatter.title}
@@ -112,8 +120,10 @@ const getPostDate = (post: PostModule) =>
                     class="magazine-cover h-full w-full object-cover"
                   />
                 </figure>
-                <div class="mt-7 text-xs font-semibold uppercase text-orange-500">
-                  {getPostTag(featuredPost)}
+                <div class="mt-7 flex flex-wrap justify-center gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500">
+                  {getPostTags(featuredPost).map((tag) => (
+                    <span class={tagBadgeClass}>{tag}</span>
+                  ))}
                 </div>
                 <h2 class="mt-3 text-3xl font-bold leading-tight lg:text-4xl">
                   {featuredPost.frontmatter.title}
@@ -147,8 +157,10 @@ const getPostDate = (post: PostModule) =>
                       class="magazine-cover h-full w-full object-cover"
                     />
                   </figure>
-                  <div class="mb-3 text-xs font-semibold uppercase text-orange-500">
-                    {getPostTag(post)}
+                  <div class="mb-3 flex flex-wrap gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500">
+                    {getPostTags(post).map((tag) => (
+                      <span class={tagBadgeClass}>{tag}</span>
+                    ))}
                   </div>
                   <h2 class="text-xl font-bold leading-tight">
                     {post.frontmatter.title}
@@ -189,8 +201,10 @@ const getPostDate = (post: PostModule) =>
                           class="magazine-cover h-full w-full object-cover"
                         />
                       </figure>
-                      <div class="mb-2 text-xs font-semibold uppercase text-orange-500">
-                        {getPostTag(post)}
+                      <div class="mb-2 flex flex-wrap gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500">
+                        {getPostTags(post).map((tag) => (
+                          <span class={tagBadgeClass}>{tag}</span>
+                        ))}
                       </div>
                       <h2 class="text-lg font-bold leading-tight">
                         {post.frontmatter.title}
