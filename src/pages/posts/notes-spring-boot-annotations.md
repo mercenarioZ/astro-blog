@@ -1,13 +1,17 @@
 ---
-title: "Learning: Common Spring Annotations"
+title: "Spring Boot annotations we keep running into"
 tags:
   - notes
   - spring
   - java
 heroImage: /posts/spring-note-1.png
-createdAt: 2026-04-11
+createdAt: 2026-06-30
 layout: ../../layouts/BlogPost.astro
 ---
+
+Spring gives us a lot of annotations, and the hard part is not memorizing every one of them. It is knowing where each annotation belongs in the shape of a normal app.
+
+These are the ones we keep meeting when an HTTP request moves through a Spring Boot project: controller, service, repository, configuration, validation, and transaction boundaries.
 
 ## Application entry point
 
@@ -16,7 +20,7 @@ layout: ../../layouts/BlogPost.astro
 It combines three ideas:
 
 - `@Configuration`: this class can define Spring beans.
-- `@EnableAutoConfiguration`: Spring Boot should configure common things automatically.
+- `@EnableAutoConfiguration`: Spring Boot should configure the usual app infrastructure automatically.
 - `@ComponentScan`: Spring should scan the current package and child packages for components.
 
 ```java
@@ -32,7 +36,7 @@ The practical rule: put this class near the root package so Spring can discover 
 
 ## Web layer
 
-`@RestController` marks a class as a REST controller. It is like `@Controller` plus `@ResponseBody`, so returned values are written to the HTTP response body.
+`@RestController` marks a class as a REST controller. We can think of it as `@Controller` plus `@ResponseBody`, so returned values are written to the HTTP response body.
 
 ```java
 @RestController
@@ -51,7 +55,7 @@ public class UserController {
 }
 ```
 
-Common request annotations:
+Request annotations we use the most:
 
 - `@RequestMapping`: base route or generic request mapping.
 - `@GetMapping`: handle GET requests.
@@ -87,11 +91,11 @@ public class UserService {
 }
 ```
 
-This is usually where application rules live. Controllers should stay thin, and repositories should focus on persistence.
+This is usually where application rules live. We keep controllers thin, then let repositories focus on persistence.
 
 ## Persistence layer
 
-`@Repository` marks a persistence component. For Spring Data JPA interfaces, extending `JpaRepository` is usually enough, but `@Repository` is still common in custom persistence classes.
+`@Repository` marks a persistence component. For Spring Data JPA interfaces, extending `JpaRepository` is usually enough, but `@Repository` still shows up in custom persistence classes.
 
 ```java
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -164,7 +168,7 @@ public class AppConfig {
 }
 ```
 
-Use this when the class comes from a library, needs custom construction, or cannot be annotated directly with `@Component`.
+We use this when the class comes from a library, needs custom construction, or cannot be annotated directly with `@Component`.
 
 ## Properties
 
@@ -191,7 +195,7 @@ For bigger applications, grouped configuration is easier to test and refactor th
 
 Validation annotations usually come from Jakarta Bean Validation.
 
-Common ones:
+The annotations we reach for first:
 
 - `@Valid`: trigger validation on a request object.
 - `@NotNull`: value cannot be null.
@@ -225,11 +229,11 @@ public void transfer(Long fromId, Long toId, BigDecimal amount) {
 
 If something fails, the transaction can roll back instead of leaving the database half-updated.
 
-I should be careful with transaction boundaries. A transaction should usually live at the service layer, not inside controllers.
+We should be careful with transaction boundaries. A transaction usually belongs at the service layer, not inside controllers.
 
-## Mental model
+## How the pieces line up
 
-The common Spring Boot shape is:
+The usual Spring Boot shape is:
 
 ```text
 HTTP request
