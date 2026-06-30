@@ -1,5 +1,5 @@
 ---
-title: "Spring Boot annotations we keep running into"
+title: "Spring Boot #1: Annotations"
 tags:
   - notes
   - spring
