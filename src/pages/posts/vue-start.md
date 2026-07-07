@@ -1,12 +1,12 @@
 ---
 title: Vue starter
-description: A React developer's guide to Vue components, reactivity, templates, props, and events
+description: My learning notes on Vue components, reactivity, templates, props, and events
 slug: vue-start
 tags:
   - notes
   - vue
   - react
-heroImage: /posts/vue-start.svg
+heroImage: /posts/vue-start.png
 createdAt: 2026-07-04
 layout: ../../layouts/BlogPost.astro
 ---

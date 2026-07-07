@@ -41,6 +41,15 @@ main article.markdown-body {
     @apply rounded bg-slate-200 px-1.5 py-0.5 text-sm text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100;
   }
 
+  h1 code,
+  h2 code,
+  h3 code,
+  h4 code,
+  h5 code {
+    font-size: 0.88em;
+    line-height: 1;
+  }
+
   pre {
     @apply mb-6 overflow-x-auto rounded-lg border border-slate-300 bg-zinc-950 p-4 text-sm text-zinc-100 shadow-xl dark:border-zinc-700;
   }
