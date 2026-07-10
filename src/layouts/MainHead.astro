@@ -17,6 +17,21 @@ const { title, description, image = "/posts/lmk-81.jpg" } = Astro.props;
 />
 <ClientRouter />
 
+{
+  import.meta.env.DEV && (
+    <>
+      {/* Vue dev HMR can run before its runtime global exists in Astro islands. */}
+      <script is:inline>
+        {`window.__VUE_HMR_RUNTIME__ ||= {
+          createRecord: () => false,
+          reload: () => {},
+          rerender: () => {},
+        };`}
+      </script>
+    </>
+  )
+}
+
 <link
   rel="icon"
   type="image/svg+xml"

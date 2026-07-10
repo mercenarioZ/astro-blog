@@ -1,7 +1,7 @@
 ---
 import HeaderLink from "./HeaderLink.astro";
 import { IoClose, IoLogoGithub, IoMenu } from "react-icons/io5";
-import ThemeToggle from "./ThemeToggleBtn";
+import ThemeToggleButton from "./ThemeToggleButton.vue";
 ---
 
 <header
@@ -77,7 +77,7 @@ import ThemeToggle from "./ThemeToggleBtn";
         </div>
       </div>
 
-      <ThemeToggle client:load />
+      <ThemeToggleButton client:load />
     </nav>
   </div>
 </header>

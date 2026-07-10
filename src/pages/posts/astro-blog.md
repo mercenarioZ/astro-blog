@@ -72,21 +72,21 @@ export default defineConfig({
 That means the page can use:
 
 ```astro
-<ThemeToggle client:load />
+<ThemeToggleButton client:load />
 <SideProjects projects={aboutSideProjects} />
 ```
 
-The important detail is that neither framework owns the page. React is used for one interactive theme toggle. Vue is used for one side-project section as a learning exercise. Either one could be replaced with Astro, Svelte, Solid, or plain browser JavaScript without rewriting the whole site.
+The important detail is that neither framework owns the page. Vue is used for one interactive theme toggle and one side-project section as a learning exercise. React is still available for components that need it. Either one could be replaced with Astro, Svelte, Solid, or plain browser JavaScript without rewriting the whole site.
 
 ## Hydration model
 
 By default, an Astro component ships HTML only. A framework component can opt into browser JavaScript with a client directive:
 
 ```astro
-<ThemeToggle client:load />
+<ThemeToggleButton client:load />
 ```
 
-That tells Astro to render the component and also ship enough React runtime code to hydrate that one island after page load.
+That tells Astro to render the component and also ship enough Vue runtime code to hydrate that one island after page load.
 
 The Vue side-project component does not need client interactivity right now, so it can render as static HTML. The component is still authored in Vue, but the browser does not need to hydrate it unless I add a directive such as `client:load`, `client:idle`, or `client:visible`.
 
