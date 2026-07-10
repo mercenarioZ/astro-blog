@@ -1,8 +1,8 @@
 import { INSTAGRAM_URL } from "../config";
 
 export const aboutHero = {
-  kicker: "Portfolio transmission",
-  title: "Le Ba Nguyen Vu (MercenarioZ) builds quiet things for loud little obsessions.",
+  kicker: "Portfolio",
+  title: "Le Ba Nguyen Vu (MercenarioZ) is trying to be niche, lol",
   description:
     "Software-leaning maker, blog keeper, and interface minimalist. I care about pages that load quickly, typography that behaves, and software that feels like it was tuned by someone who actually uses it.",
   mode: "Learning architecture. Building productivity utilities.",
@@ -66,7 +66,6 @@ export const aboutFragments = [
   "Frontend developer trying to make niche stuff",
   "Backend services built to be boring, observable, and easy to recover",
   "Learning infrastructure by shipping small systems end to end",
-  "AWS EC2 experiments, Linux servers, deployment scripts, and logs",
 ];
 
 export const aboutEducation = [
@@ -85,7 +84,7 @@ export const aboutWorkExperience = [
     period: "Sep 2025 - Present",
     title: "Cigro",
     place: "Ho Chi Minh City",
-    body: "Placeholder for a tool that improves daily workflow, captures repeated tasks, or connects UI to backend behavior.",
+    body: "Fullstack developer mainly solve frontend issues (React, Vue), Spring Boot for backend side",
   },
   {
     period: "May 2023 - Nov 2023",
