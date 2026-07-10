@@ -162,8 +162,8 @@ Reduced-motion media queries disable nonessential animation.
 Install dependencies and start the local server:
 
 ```sh
-npm install / bun install
-npm run dev / bun dev
+npm install
+npm run dev
 ```
 
 Available commands:
