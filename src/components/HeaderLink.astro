@@ -3,18 +3,27 @@ import "../../styles/header-link.css";
 
 export interface Props extends astroHTML.JSX.AnchorHTMLAttributes {}
 
-const { href, class: className, ...props } = Astro.props;
+const {
+  href,
+  class: className,
+  target,
+  rel,
+  ...props
+} = Astro.props;
 const normalizePath = (path: string) => path.replace(/\/$/, "") || "/";
+const isInternal = typeof href === "string" && href.startsWith("/");
 const isActive =
-  typeof href === "string" &&
-  href.startsWith("/") &&
+  isInternal &&
   normalizePath(href) === normalizePath(Astro.url.pathname);
+const safeRel = target === "_blank" ? (rel ?? "noopener noreferrer") : rel;
 ---
 
 <a
   href={href}
   class:list={["nav-link", className, { active: isActive }]}
   aria-current={isActive ? "page" : undefined}
-  data-nav-link
+  data-nav-link={isInternal ? "" : undefined}
+  target={target}
+  rel={safeRel}
   {...props}
 ><slot /></a>

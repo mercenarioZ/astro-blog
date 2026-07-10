@@ -73,7 +73,7 @@ export const aboutEducation = [
     period: "Oct 2020 - Apr 2025",
     title: "Electronics and Telecommunications Engineering",
     place: "Ho Chi Minh City University of Technologies",
-    body: "Placeholder for major, coursework, academic projects, and architecture fundamentals.",
+    body: "Studied communication systems, embedded electronics, and software engineering fundamentals.",
     image: "/images/HCMUT_official_logo.png",
     imageAlt: "HCMUT official logo",
   },
@@ -84,12 +84,12 @@ export const aboutWorkExperience = [
     period: "Sep 2025 - Present",
     title: "Cigro",
     place: "Ho Chi Minh City",
-    body: "Fullstack developer mainly solve frontend issues (React, Vue), Spring Boot for backend side",
+    body: "Full-stack developer focused on frontend work in React and Vue, with Spring Boot services on the backend.",
   },
   {
     period: "May 2023 - Nov 2023",
     title: "VNPT",
     place: "Ho Chi Minh City",
-    body: "Build web app with ASP.NET to monitor networking devices (switch, router, etc)",
+    body: "Built an ASP.NET web application for monitoring network devices such as switches and routers.",
   },
 ];

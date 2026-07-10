@@ -5,18 +5,25 @@ import MainHead from "./MainHead.astro";
 interface Props {
   title: string;
   description?: string;
+  image?: string;
+  type?: "article" | "website";
+  bodyClass?: string;
 }
 
-const { title, description } = Astro.props as Props;
+const { title, description, image, type, bodyClass } = Astro.props as Props;
 ---
 
 <!doctype html>
 <html lang="en">
-  <MainHead title={title} description={description} />
-  <Body>
-    <div>
-      <slot />
-    </div>
+  <head>
+    <MainHead
+      title={title}
+      description={description}
+      image={image}
+      type={type}
+    />
+  </head>
+  <Body class={bodyClass}>
+    <slot />
   </Body>
 </html>
-

@@ -2,68 +2,23 @@
 import "../../styles/home.css";
 import Content from "../components/Content.astro";
 import Footer from "../components/Footer.astro";
-import MainLayout from "../layouts/MainLayout.astro";
-import { SITE_DESCRIPTION } from "../config";
-import { Image } from "astro:assets";
 import Header from "../components/Header.astro";
+import PostCard from "../components/PostCard.astro";
+import { SITE_DESCRIPTION } from "../config";
+import MainLayout from "../layouts/MainLayout.astro";
+import { getPosts } from "../lib/posts";
 
-interface PostModule {
-  url: string;
-  frontmatter: {
-    createdAt: string;
-    heroImage: string;
-    tag?: string[];
-    tags?: string[];
-    title: string;
-    description: string;
-  };
-}
-
-// get all sorted posts
-const postModules = import.meta.glob<PostModule>(
-  ["../pages/posts/*.md", "../pages/posts/*.mdx"],
-  {
-    eager: true,
-  }
-);
-const posts = Object.values(postModules) as PostModule[];
-
-posts.sort(
-  (a, b) =>
-    new Date(b.frontmatter.createdAt).valueOf() -
-    new Date(a.frontmatter.createdAt).valueOf()
-);
-
-const [featuredPost, ...secondaryPosts] = posts;
+const [featuredPost, ...secondaryPosts] = getPosts();
 const leftAsidePosts = secondaryPosts.slice(0, 2);
 const rightAsidePosts = secondaryPosts.slice(2, 4);
 const remainingPosts = secondaryPosts.slice(4);
-
-const postDateFormatter = new Intl.DateTimeFormat("en", {
-  day: "2-digit",
-  month: "short",
-  year: "numeric",
-});
-
-const formatTag = (tag: string) =>
-  tag.charAt(0).toUpperCase() + tag.slice(1);
-
-const getPostTags = (post: PostModule) => {
-  const tags = post.frontmatter.tags ?? post.frontmatter.tag ?? ["Post"];
-  return tags.map(formatTag);
-};
-
-const tagBadgeClass =
-  "inline-flex rounded-full border border-orange-500/30 bg-orange-500/10 px-2 py-0.5 leading-none text-orange-600 dark:text-orange-300";
-
-const getPostDate = (post: PostModule) =>
-  postDateFormatter.format(new Date(post.frontmatter.createdAt));
 ---
 
 <MainLayout description={SITE_DESCRIPTION} title="MercenarioZ's blog">
   <Header />
   <main class="pt-[70px]">
     <Content className="max-w-[1320px] mt-16">
+      <h1 class="sr-only">MercenarioZ's blog</h1>
       <section id="fade-target">
         <div
           class="grid grid-cols-1 gap-8 lg:grid-cols-[repeat(16,minmax(0,1fr))] lg:gap-6 xl:gap-8"
@@ -71,107 +26,15 @@ const getPostDate = (post: PostModule) =>
           <aside
             class="magazine-card magazine-card-left order-2 space-y-8 border-t border-slate-400 pt-8 dark:border-zinc-600 lg:order-1 lg:col-span-4 lg:border-t-0 lg:border-r lg:pr-6 xl:pr-8"
           >
-            {
-              leftAsidePosts.map((post) => (
-                <a
-                  href={post.url}
-                  class="magazine-post group block border-b border-slate-400 pb-8 last:border-b-0 last:pb-0 dark:border-zinc-600"
-                >
-                  <figure class="magazine-image mb-5 aspect-[1.55/1] w-full overflow-hidden border border-slate-400 dark:border-zinc-700">
-                    <Image
-                      width={520}
-                      height={520 / 1.55}
-                      src={post.frontmatter.heroImage}
-                      alt={post.frontmatter.title}
-                      class="magazine-cover h-full w-full object-cover"
-                    />
-                  </figure>
-                  <div class="mb-3 flex flex-wrap gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500">
-                    {getPostTags(post).map((tag) => (
-                      <span class={tagBadgeClass}>{tag}</span>
-                    ))}
-                  </div>
-                  <h2 class="text-xl font-bold leading-tight">
-                    {post.frontmatter.title}
-                  </h2>
-                  <p class="mt-3 opacity-80">{post.frontmatter.description}</p>
-                  <p class="mt-4 text-sm font-medium opacity-60">
-                    {getPostDate(post)}
-                  </p>
-                </a>
-              ))
-            }
+            {leftAsidePosts.map((post) => <PostCard post={post} />)}
           </aside>
 
-          {
-            featuredPost && (
-              <a
-                href={featuredPost.url}
-                class="magazine-card magazine-card-featured magazine-post group order-1 block text-center lg:order-2 lg:col-span-8 lg:px-2"
-              >
-                <figure
-                  class="magazine-image aspect-[1.618/1] w-full overflow-hidden border border-slate-400 dark:border-zinc-700"
-                >
-                  <Image
-                    width={1040}
-                    height={1040 / 1.618}
-                    src={featuredPost.frontmatter.heroImage}
-                    alt={featuredPost.frontmatter.title}
-                    class="magazine-cover h-full w-full object-cover"
-                  />
-                </figure>
-                <div class="mt-7 flex flex-wrap justify-center gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500">
-                  {getPostTags(featuredPost).map((tag) => (
-                    <span class={tagBadgeClass}>{tag}</span>
-                  ))}
-                </div>
-                <h2 class="mt-3 text-3xl font-bold leading-tight lg:text-4xl">
-                  {featuredPost.frontmatter.title}
-                </h2>
-
-                <p class="mx-auto mt-4 max-w-2xl text-lg opacity-80">
-                  {featuredPost.frontmatter.description}
-                </p>
-                <p class="mt-5 text-sm font-medium opacity-60">
-                  {getPostDate(featuredPost)}
-                </p>
-              </a>
-            )
-          }
+          {featuredPost && <PostCard post={featuredPost} variant="featured" />}
 
           <aside
             class="magazine-card magazine-card-right order-3 space-y-8 border-t border-slate-400 pt-8 dark:border-zinc-600 lg:col-span-4 lg:border-t-0 lg:border-l lg:pl-6 xl:pl-8"
           >
-            {
-              rightAsidePosts.map((post) => (
-                <a
-                  href={post.url}
-                  class="magazine-post group block border-b border-slate-400 pb-8 last:border-b-0 last:pb-0 dark:border-zinc-600"
-                >
-                  <figure class="magazine-image mb-5 aspect-[1.55/1] w-full overflow-hidden border border-slate-400 dark:border-zinc-700">
-                    <Image
-                      width={520}
-                      height={520 / 1.55}
-                      src={post.frontmatter.heroImage}
-                      alt={post.frontmatter.title}
-                      class="magazine-cover h-full w-full object-cover"
-                    />
-                  </figure>
-                  <div class="mb-3 flex flex-wrap gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500">
-                    {getPostTags(post).map((tag) => (
-                      <span class={tagBadgeClass}>{tag}</span>
-                    ))}
-                  </div>
-                  <h2 class="text-xl font-bold leading-tight">
-                    {post.frontmatter.title}
-                  </h2>
-                  <p class="mt-3 opacity-80">{post.frontmatter.description}</p>
-                  <p class="mt-4 text-sm font-medium opacity-60">
-                    {getPostDate(post)}
-                  </p>
-                </a>
-              ))
-            }
+            {rightAsidePosts.map((post) => <PostCard post={post} />)}
           </aside>
         </div>
 
@@ -191,31 +54,7 @@ const getPostDate = (post: PostModule) =>
                     class="magazine-card"
                     style={`animation-delay: ${300 + index * 80}ms`}
                   >
-                    <a href={post.url} class="magazine-post group block">
-                      <figure class="magazine-image mb-4 aspect-[1.55/1] w-full overflow-hidden border border-slate-400 dark:border-zinc-700">
-                        <Image
-                          width={420}
-                          height={420 / 1.55}
-                          src={post.frontmatter.heroImage}
-                          alt={post.frontmatter.title}
-                          class="magazine-cover h-full w-full object-cover"
-                        />
-                      </figure>
-                      <div class="mb-2 flex flex-wrap gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500">
-                        {getPostTags(post).map((tag) => (
-                          <span class={tagBadgeClass}>{tag}</span>
-                        ))}
-                      </div>
-                      <h2 class="text-lg font-bold leading-tight">
-                        {post.frontmatter.title}
-                      </h2>
-                      <p class="mt-2 text-sm opacity-80">
-                        {post.frontmatter.description}
-                      </p>
-                      <p class="mt-3 text-xs font-medium opacity-60">
-                        {getPostDate(post)}
-                      </p>
-                    </a>
+                    <PostCard post={post} variant="latest" />
                   </li>
                 ))}
               </ul>

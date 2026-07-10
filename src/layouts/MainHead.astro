@@ -1,20 +1,28 @@
 ---
 import "../../styles/global.css";
 import { ClientRouter } from "astro:transitions";
+import { SITE_DESCRIPTION } from "../config";
 
-const { title, description, image = "/posts/lmk-81.jpg" } = Astro.props;
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: "article" | "website";
+}
+
+const {
+  title,
+  description = SITE_DESCRIPTION,
+  image = "/posts/lmk-81.jpg",
+  type = "website",
+} = Astro.props as Props;
+
+const imageUrl = new URL(image, Astro.url);
 ---
 
 <meta charset="utf-8" />
-<link
-  rel="icon"
-  type="image/svg+xml"
-  href="/favicon.svg"
-/>
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1"
-/>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <ClientRouter />
 
 {
@@ -32,82 +40,40 @@ const { title, description, image = "/posts/lmk-81.jpg" } = Astro.props;
   )
 }
 
-<link
-  rel="icon"
-  type="image/svg+xml"
-  href="/favicon.svg"
-/>
-
-<meta
-  name="generator"
-  content={Astro.generator}
-/>
+<meta name="generator" content={Astro.generator} />
 
 <title>{title}</title>
-<meta
-  name="title"
-  content={title}
-/>
-<meta
-  name="description"
-  content={description}
-/>
+<meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
-<meta
-  property="og:type"
-  content="website"
-/>
-<meta
-  property="og:url"
-  content={Astro.url}
-/>
-<meta
-  property="og:title"
-  content={title}
-/>
-<meta
-  property="og:description"
-  content={description}
-/>
-<meta
-  property="og:image"
-  content={new URL(image, Astro.url)}
-/>
+<meta property="og:type" content={type} />
+<meta property="og:url" content={Astro.url} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={imageUrl} />
 
 <!-- Twitter -->
-<meta
-  property="twitter:card"
-  content="summary_large_image"
-/>
-
-<meta
-  property="twitter:url"
-  content={Astro.url}
-/>
-<meta
-  property="twitter:title"
-  content={title}
-/>
-<meta
-  property="twitter:description"
-  content={description}
-/>
-<meta
-  property="twitter:image"
-  content={new URL(image, Astro.url)}
-/>
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
 
 <!-- This script is used to prevent flash when reloading -->
 <script is:inline>
   (() => {
-    const getTheme = () => {
-      if (
-        typeof localStorage !== "undefined" &&
-        localStorage.getItem("theme")
-      ) {
-        return localStorage.getItem("theme");
+    const getStoredTheme = () => {
+      try {
+        const theme = localStorage.getItem("theme");
+        return theme === "light" || theme === "dark" ? theme : undefined;
+      } catch {
+        return undefined;
       }
+    };
+
+    const getTheme = () => {
+      const storedTheme = getStoredTheme();
+
+      if (storedTheme) return storedTheme;
 
       if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
         return "dark";

@@ -15,18 +15,19 @@ import ThemeToggleButton from "./ThemeToggleButton.vue";
       <a
         href="/"
         class="group"
+        aria-label="MercenarioZ home"
       >
-        <h2
+        <span
           class="font-bold text-xl hover:-translate-y-0.5 transition duration-400 hover:underline"
         >
           MercenarioZ
-        </h2>
+        </span>
       </a>
 
       <div class="items-center gap-6 hidden md:flex">
         <HeaderLink href="/about">About</HeaderLink>
         <HeaderLink target="_blank" href="https://github.com/mercenarioZ"
-          ><IoLogoGithub /> GitHub</HeaderLink
+          ><IoLogoGithub aria-hidden="true" /> GitHub</HeaderLink
         >
       </div>
       <div class="flex-1"></div>
@@ -44,13 +45,13 @@ import ThemeToggleButton from "./ThemeToggleButton.vue";
           data-mobile-nav-button
         >
           <span data-mobile-nav-open>
-            <IoMenu />
+            <IoMenu aria-hidden="true" />
           </span>
           <span
             class="hidden"
             data-mobile-nav-close
           >
-            <IoClose />
+            <IoClose aria-hidden="true" />
           </span>
         </button>
 
@@ -71,7 +72,7 @@ import ThemeToggleButton from "./ThemeToggleButton.vue";
               href="https://github.com/mercenarioZ"
               class="rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-zinc-800"
             >
-              <IoLogoGithub /> GitHub
+              <IoLogoGithub aria-hidden="true" /> GitHub
             </HeaderLink>
           </div>
         </div>

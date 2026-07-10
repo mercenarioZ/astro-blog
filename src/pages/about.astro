@@ -94,6 +94,7 @@ const aboutSideProjects = sideProjectEntries
               <a
                 href={aboutLinks.github}
                 target="_blank"
+                rel="noopener noreferrer"
                 class="about-link inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
               >
                 <IoLogoGithub />
@@ -102,6 +103,7 @@ const aboutSideProjects = sideProjectEntries
               <a
                 href={aboutLinks.instagram}
                 target="_blank"
+                rel="noopener noreferrer"
                 class="about-link inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
               >
                 <IoLogoInstagram />
@@ -302,15 +304,16 @@ const aboutSideProjects = sideProjectEntries
 </MainLayout>
 
 <script>
+  let cleanupScrollIndicator = () => {};
+
   const setupScrollIndicator = () => {
+    cleanupScrollIndicator();
+
     const indicator = document.querySelector<HTMLElement>(
       "[data-scroll-indicator]",
     );
 
     if (!indicator) return;
-    if (indicator.dataset.scrollIndicatorReady === "true") return;
-
-    indicator.dataset.scrollIndicatorReady = "true";
 
     const updateVisibility = () => {
       const canScroll =
@@ -327,8 +330,15 @@ const aboutSideProjects = sideProjectEntries
     updateVisibility();
     window.addEventListener("scroll", updateVisibility, { passive: true });
     window.addEventListener("resize", updateVisibility);
+
+    cleanupScrollIndicator = () => {
+      window.removeEventListener("scroll", updateVisibility);
+      window.removeEventListener("resize", updateVisibility);
+      cleanupScrollIndicator = () => {};
+    };
   };
 
   setupScrollIndicator();
   document.addEventListener("astro:page-load", setupScrollIndicator);
+  document.addEventListener("astro:before-swap", cleanupScrollIndicator);
 </script>
