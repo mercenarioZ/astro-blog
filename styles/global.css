@@ -18,65 +18,83 @@ html.theme-transitioning,
 html.theme-transitioning *,
 html.theme-transitioning *::before,
 html.theme-transitioning *::after {
-  transition-duration: 520ms;
+  transition-duration: 1020ms;
   transition-property:
-    background-color, border-color, box-shadow, color, fill, opacity,
-    outline-color, stroke, text-decoration-color, transform;
+    background-color, border-color, box-shadow, color, fill, outline-color,
+    stroke, text-decoration-color;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.theme-toggle-icon {
-  transform-origin: center;
-  transition:
-    filter 300ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 220ms ease,
-    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+html.theme-view-transition *,
+html.theme-view-transition *::before,
+html.theme-view-transition *::after {
+  transition: none !important;
 }
 
-.theme-toggle-icon-sun {
-  --theme-toggle-active-rotate: 0deg;
-  --theme-toggle-inactive-rotate: -45deg;
-  --theme-toggle-icon-glow: drop-shadow(0 0 6px rgb(234 88 12 / 28%));
+html.theme-view-transition .theme-toggle-shell {
+  view-transition-name: theme-toggle;
 }
 
-.theme-toggle-icon-moon {
-  --theme-toggle-active-rotate: -12deg;
-  --theme-toggle-inactive-rotate: 45deg;
-  --theme-toggle-icon-glow: drop-shadow(0 0 6px rgb(125 211 252 / 32%));
+html.theme-view-transition::view-transition-old(root),
+html.theme-view-transition::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
 
-.theme-toggle-icon-active {
-  animation: theme-toggle-icon-pop 420ms cubic-bezier(0.22, 1, 0.36, 1);
-  filter: var(--theme-toggle-icon-glow);
-  opacity: 1;
-  transform: rotate(var(--theme-toggle-active-rotate)) scale(1.12);
+html.theme-view-transition::view-transition-old(root) {
+  z-index: 1;
 }
 
-.theme-toggle-icon-inactive {
-  filter: none;
-  opacity: 0.58;
-  transform: rotate(var(--theme-toggle-inactive-rotate)) scale(0.86);
+html.theme-view-transition::view-transition-new(root) {
+  z-index: 2;
 }
 
-@keyframes theme-toggle-icon-pop {
-  0% {
-    opacity: 0.2;
-    transform: rotate(var(--theme-toggle-inactive-rotate)) scale(0.65);
+html.theme-view-transition::view-transition-group(theme-toggle) {
+  z-index: 3;
+  animation-duration: 820ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.theme-view-transition::view-transition-old(theme-toggle) {
+  animation: theme-toggle-snapshot-out 580ms ease-in both;
+  mix-blend-mode: normal;
+}
+
+html.theme-view-transition::view-transition-new(theme-toggle) {
+  animation: theme-toggle-snapshot-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1) 80ms both;
+  mix-blend-mode: normal;
+}
+
+@keyframes theme-toggle-snapshot-out {
+  to {
+    filter: blur(2px);
+    opacity: 0;
+    transform: rotate(-5deg) scale(0.82);
+  }
+}
+
+@keyframes theme-toggle-snapshot-in {
+  from {
+    filter: blur(2px);
+    opacity: 0;
+    transform: rotate(7deg) scale(0.78);
   }
 
-  65% {
+  62% {
+    filter: blur(0);
     opacity: 1;
-    transform: rotate(calc(var(--theme-toggle-active-rotate) - 10deg))
-      scale(1.22);
+    transform: rotate(-2deg) scale(1.06);
   }
 
-  100% {
+  to {
+    filter: blur(0);
     opacity: 1;
-    transform: rotate(var(--theme-toggle-active-rotate)) scale(1.12);
+    transform: rotate(0) scale(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   html.theme-transitioning,
   html.theme-transitioning *,
   html.theme-transitioning *::before,
@@ -84,7 +102,11 @@ html.theme-transitioning *::after {
     transition-duration: 1ms;
   }
 
-  .theme-toggle-icon-active {
+  html.theme-view-transition::view-transition-old(root),
+  html.theme-view-transition::view-transition-new(root),
+  html.theme-view-transition::view-transition-group(theme-toggle),
+  html.theme-view-transition::view-transition-old(theme-toggle),
+  html.theme-view-transition::view-transition-new(theme-toggle) {
     animation: none;
   }
 }
