@@ -1,11 +1,10 @@
 ---
-title: Vue starter
+title: "Vue #1"
 description: My learning notes on Vue components, reactivity, templates, props, and events
 slug: vue-start
 tags:
   - notes
   - vue
-  - react
 heroImage: vue-start/hero.png
 createdAt: 2026-07-04
 layout: ../../layouts/BlogPost.astro
