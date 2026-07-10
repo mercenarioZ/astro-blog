@@ -1,5 +1,6 @@
 ---
 import "../../styles/about.css";
+import { Image } from "astro:assets";
 import Content from "../components/Content.astro";
 import Header from "../components/Header.astro";
 import SideProjects from "../components/SideProjects.vue";
@@ -233,9 +234,10 @@ const aboutSideProjects = sideProjectEntries
                         {
                           "image" in entry && (
                           <div class="about-entry-logo">
-                            <img
+                            <Image
                               src={entry.image}
                               alt={entry.imageAlt}
+                              width={58}
                               loading="lazy"
                               decoding="async"
                             />

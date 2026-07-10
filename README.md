@@ -20,10 +20,13 @@ a framework component is useful.
 
 ```text
 .
-├── public/                     # Files copied directly to the built site
-│   ├── images/                 # About-page images
-│   └── posts/                  # Post covers and inline post assets
+├── public/                     # Unprocessed files with stable public URLs
+│   └── favicon.svg
 ├── src/
+│   ├── assets/                 # Images processed and bundled by Astro
+│   │   ├── about/              # About-page imagery
+│   │   ├── posts/<slug>/       # Post-owned cover images
+│   │   └── social/             # Default social-card source image
 │   ├── components/             # Reusable Astro, Vue, and React components
 │   ├── content/
 │   │   └── side-projects/      # Markdown entries for the side-project grid
@@ -61,9 +64,12 @@ cover image, publication date, title, description, and Markdown content slot.
 
 ```text
 src/pages/posts/*.{md,mdx}
-        ↓
+        ├──────────────┐
+        ↓              ↓
 src/lib/posts.ts
-        ↓
+        ↓       src/lib/images.ts
+        └──────────────┘
+               ↓
 src/pages/index.astro
         ↓
 src/components/PostCard.astro
@@ -87,14 +93,11 @@ title: Post title
 description: Short summary used on cards and in metadata
 tags:
   - tech
-heroImage: /posts/example-cover.svg
+heroImage: example-post/hero.jpg
 createdAt: 2026-07-10
 layout: ../../layouts/BlogPost.astro
 ---
 ```
-
-Place referenced images in `public/posts/`. Their public URLs start with
-`/posts/`.
 
 ### About page and content collection
 
@@ -159,8 +162,8 @@ Reduced-motion media queries disable nonessential animation.
 Install dependencies and start the local server:
 
 ```sh
-npm install
-npm run dev
+npm install / bun install
+npm run dev / bun dev
 ```
 
 Available commands:

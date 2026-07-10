@@ -4,7 +4,7 @@ description: Notes on building a quieter workflow with command-line tools
 slug: cli-vim
 tags:
   - tech
-heroImage: /posts/cli-vim.svg
+heroImage: cli-vim/hero.svg
 createdAt: 2026-06-15
 layout: ../../layouts/BlogPost.astro
 ---

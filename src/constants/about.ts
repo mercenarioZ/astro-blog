@@ -1,4 +1,5 @@
 import { INSTAGRAM_URL } from "../config";
+import hcmutLogo from "../assets/about/hcmut-logo.png";
 
 export const aboutHero = {
   kicker: "Portfolio",
@@ -74,7 +75,7 @@ export const aboutEducation = [
     title: "Electronics and Telecommunications Engineering",
     place: "Ho Chi Minh City University of Technologies",
     body: "Studied communication systems, embedded electronics, and software engineering fundamentals.",
-    image: "/images/HCMUT_official_logo.png",
+    image: hcmutLogo,
     imageAlt: "HCMUT official logo",
   },
 ];

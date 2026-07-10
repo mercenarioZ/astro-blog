@@ -4,7 +4,7 @@ description: My current daily driver keyboard
 slug: lofree-flow-lite
 tags:
   - uses
-heroImage: /posts/lofree-flow-lite.JPG
+heroImage: lofree-flow-lite/hero.jpg
 createdAt: 2026-04-03
 layout: ../../layouts/BlogPost.astro
 ---
@@ -16,4 +16,3 @@ I've changed from the LMK81 to this, the **Lofree Flow Lite**, as my daily keybo
 The first thing that stands out is how thin and clean it looks on the desk. I can place it perfectly to the front of my MacBook 14-inch, that's the main reason why I chose this keyboard.
 
 I chose the lite version because of its weight, just around half a kilogram, therefore I can carry it to everywhere without worrying about the weight.
-

@@ -1,28 +1,44 @@
 ---
 import "../../styles/global.css";
+import { getImage } from "astro:assets";
 import { ClientRouter } from "astro:transitions";
+import defaultSocialImage from "../assets/social/default-og.jpg";
 import { SITE_DESCRIPTION } from "../config";
+import type { ImageSource } from "../lib/images";
 
 interface Props {
   title: string;
   description?: string;
-  image?: string;
+  image?: ImageSource;
   type?: "article" | "website";
 }
 
 const {
   title,
   description = SITE_DESCRIPTION,
-  image = "/posts/lmk-81.jpg",
+  image = defaultSocialImage,
   type = "website",
 } = Astro.props as Props;
 
-const imageUrl = new URL(image, Astro.url);
+const socialImage =
+  typeof image === "string"
+    ? image
+    : (
+        await getImage({
+          src: image,
+          width: 1200,
+          height: 630,
+          fit: "cover",
+          format: "jpg",
+          quality: 80,
+        })
+      ).src;
+const imageUrl = new URL(socialImage, Astro.url);
 ---
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
 <ClientRouter />
 
 {

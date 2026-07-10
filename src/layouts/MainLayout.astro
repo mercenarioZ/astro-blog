@@ -1,11 +1,12 @@
 ---
 import Body from "../components/Body.astro";
+import type { ImageSource } from "../lib/images";
 import MainHead from "./MainHead.astro";
 
 interface Props {
   title: string;
   description?: string;
-  image?: string;
+  image?: ImageSource;
   type?: "article" | "website";
   bodyClass?: string;
 }

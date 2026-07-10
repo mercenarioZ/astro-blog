@@ -4,7 +4,7 @@ tags:
   - notes
   - spring
   - java
-heroImage: /posts/spring-note-1.png
+heroImage: notes-spring-boot-annotations/hero.png
 createdAt: 2026-06-30
 layout: ../../layouts/BlogPost.astro
 ---

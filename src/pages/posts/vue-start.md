@@ -6,7 +6,7 @@ tags:
   - notes
   - vue
   - react
-heroImage: /posts/vue-start.png
+heroImage: vue-start/hero.png
 createdAt: 2026-07-04
 layout: ../../layouts/BlogPost.astro
 ---

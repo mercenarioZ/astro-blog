@@ -4,7 +4,7 @@ description: Static routes, content modules, islands, and multi-framework compon
 slug: astro-blog
 tags:
   - tech
-heroImage: /posts/astro-blog.svg
+heroImage: astro-blog/hero.svg
 createdAt: 2026-06-17
 layout: ../../layouts/BlogPost.astro
 ---
@@ -36,7 +36,7 @@ Each post has frontmatter like this:
 ```yaml
 title: How this Astro blog is wired
 description: Static routes, content modules, islands, and multi-framework components
-heroImage: /posts/astro-blog.svg
+heroImage: astro-blog/hero.svg
 createdAt: 2026-06-17
 layout: ../../layouts/BlogPost.astro
 ```

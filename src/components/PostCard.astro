@@ -46,13 +46,27 @@ const tagBadgeClass =
           : "mb-5 aspect-[1.55/1]",
     ]}
   >
-    <Image
-      width={imageWidth}
-      height={imageWidth / imageRatio}
-      src={post.frontmatter.heroImage}
-      alt={post.frontmatter.title}
-      class="magazine-cover h-full w-full object-cover"
-    />
+    {
+      typeof post.frontmatter.heroImage === "string" ? (
+        <img
+          width={imageWidth}
+          height={imageWidth / imageRatio}
+          src={post.frontmatter.heroImage}
+          alt={post.frontmatter.title}
+          class="magazine-cover h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <Image
+          width={imageWidth}
+          height={imageWidth / imageRatio}
+          src={post.frontmatter.heroImage}
+          alt={post.frontmatter.title}
+          class="magazine-cover h-full w-full object-cover"
+        />
+      )
+    }
   </figure>
 
   <div
