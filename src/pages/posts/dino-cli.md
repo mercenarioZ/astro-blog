@@ -4,7 +4,7 @@ description: Notes on turning everyday Git and writing workflows into small loca
 slug: dino-cli
 tags:
   - tech
-heroImage: dino-cli/hero.svg
+heroImage: dino-cli/hero-v2.svg
 createdAt: 2026-06-18
 layout: ../../layouts/BlogPost.astro
 ---

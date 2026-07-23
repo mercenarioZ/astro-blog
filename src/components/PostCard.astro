@@ -1,119 +1,35 @@
 ---
-import { Image } from "astro:assets";
 import {
   getPostDate,
   getPostTags,
   type PostModule,
 } from "../lib/posts";
 
-type Variant = "aside" | "featured" | "latest";
-
 interface Props {
   post: PostModule;
-  variant?: Variant;
+  index?: number;
 }
 
-const { post, variant = "aside" } = Astro.props as Props;
-const isFeatured = variant === "featured";
-const isLatest = variant === "latest";
-
-const imageWidth = isFeatured ? 1040 : isLatest ? 420 : 520;
-const imageRatio = isFeatured ? 1.618 : 1.55;
-
-const tagBadgeClass =
-  "inline-flex rounded-full border border-orange-500/30 bg-orange-500/10 px-2 py-0.5 leading-none text-orange-600 dark:text-orange-300";
+const { post, index = 1 } = Astro.props as Props;
+const tags = getPostTags(post);
 ---
 
-<a
-  href={post.url}
-  class:list={[
-    "magazine-post group block",
-    {
-      "magazine-card magazine-card-featured order-1 text-center lg:order-2 lg:col-span-8 lg:px-2":
-        isFeatured,
-      "border-b border-slate-400 pb-8 last:border-b-0 last:pb-0 dark:border-zinc-600":
-        variant === "aside",
-    },
-  ]}
->
-  <figure
-    class:list={[
-      "magazine-image w-full overflow-hidden border border-slate-400 dark:border-zinc-700",
-      isFeatured
-        ? "aspect-[1.618/1]"
-        : isLatest
-          ? "mb-4 aspect-[1.55/1]"
-          : "mb-5 aspect-[1.55/1]",
-    ]}
-  >
-    {
-      typeof post.frontmatter.heroImage === "string" ? (
-        <img
-          width={imageWidth}
-          height={imageWidth / imageRatio}
-          src={post.frontmatter.heroImage}
-          alt={post.frontmatter.title}
-          class="magazine-cover h-full w-full object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-      ) : (
-        <Image
-          width={imageWidth}
-          height={imageWidth / imageRatio}
-          src={post.frontmatter.heroImage}
-          alt={post.frontmatter.title}
-          class="magazine-cover h-full w-full object-cover"
-        />
-      )
-    }
-  </figure>
+<a href={post.url} class="post-row">
+  <span class="post-row__number" aria-hidden="true">
+    {String(index).padStart(2, "0")}
+  </span>
 
-  <div
-    class:list={[
-      "flex flex-wrap gap-x-2 gap-y-1 text-xs font-semibold uppercase text-orange-500",
-      isFeatured ? "mt-7 justify-center" : isLatest ? "mb-2" : "mb-3",
-    ]}
-  >
-    {getPostTags(post).map((tag) => <span class={tagBadgeClass}>{tag}</span>)}
-  </div>
+  <span class="post-row__body">
+    <span class="post-row__meta">
+      <time>{getPostDate(post)}</time>
+      <span aria-hidden="true">/</span>
+      <span>{tags.join(", ")}</span>
+    </span>
+    <span class="post-row__title">{post.frontmatter.title}</span>
+    <span class="post-row__description">
+      {post.frontmatter.description}
+    </span>
+  </span>
 
-  <h2
-    class:list={[
-      "font-bold leading-tight",
-      isFeatured
-        ? "mt-3 text-3xl lg:text-4xl"
-        : isLatest
-          ? "text-lg"
-          : "text-xl",
-    ]}
-  >
-    {post.frontmatter.title}
-  </h2>
-
-  <p
-    class:list={[
-      "opacity-80",
-      isFeatured
-        ? "mx-auto mt-4 max-w-2xl text-lg"
-        : isLatest
-          ? "mt-2 text-sm"
-          : "mt-3",
-    ]}
-  >
-    {post.frontmatter.description}
-  </p>
-
-  <p
-    class:list={[
-      "font-medium opacity-60",
-      isFeatured
-        ? "mt-5 text-sm"
-        : isLatest
-          ? "mt-3 text-xs"
-          : "mt-4 text-sm",
-    ]}
-  >
-    {getPostDate(post)}
-  </p>
+  <span class="post-row__arrow" aria-hidden="true">↗</span>
 </a>

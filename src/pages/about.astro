@@ -2,6 +2,7 @@
 import "../../styles/about.css";
 import { Image } from "astro:assets";
 import Content from "../components/Content.astro";
+import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import SideProjects from "../components/SideProjects.vue";
 import MainLayout from "../layouts/MainLayout.astro";
@@ -15,49 +16,6 @@ import {
   aboutPrinciples,
   aboutWorkExperience,
 } from "../constants/about";
-import {
-  IoCodeSlash,
-  IoLogoGithub,
-  IoLogoInstagram,
-  IoLogoNodejs,
-  IoLogoReact,
-  IoRadioOutline,
-  IoServerOutline,
-  IoTerminalOutline,
-} from "react-icons/io5";
-import { FaJava } from "react-icons/fa";
-import {
-  SiAndroid,
-  SiAstro,
-  SiDocker,
-  SiKotlin,
-  SiLinux,
-  SiMongodb,
-  SiPostgresql,
-  SiSpringboot,
-  SiTailwindcss,
-  SiTypescript,
-} from "react-icons/si";
-import { FaAws } from "react-icons/fa6";
-
-const capabilityIcons = {
-  astro: SiAstro,
-  react: IoLogoReact,
-  typescript: SiTypescript,
-  java: FaJava,
-  kotlin: SiKotlin,
-  android: SiAndroid,
-  tailwind: SiTailwindcss,
-  node: IoLogoNodejs,
-  springboot: SiSpringboot,
-  terminal: IoTerminalOutline,
-  ec2: FaAws,
-  linux: SiLinux,
-  docker: SiDocker,
-  postgresql: SiPostgresql,
-  mongodb: SiMongodb,
-  server: IoServerOutline,
-};
 
 const sideProjectEntries = await getCollection("sideProjects");
 const aboutSideProjects = sideProjectEntries
@@ -73,211 +31,102 @@ const aboutSideProjects = sideProjectEntries
 
 <MainLayout title="About">
   <Header />
-  <main class="about-grid min-h-screen pt-24 md:pt-28">
-    <Content className="max-w-5xl pb-20">
-      <section class="about-panel overflow-hidden rounded-lg">
-        <div class="grid gap-10 p-6 md:grid-cols-[1.35fr_0.65fr] md:p-10">
-          <div>
-            <div class="about-kicker rounded-full px-3 py-1 text-xs font-bold uppercase tracking-[0.16em]">
-              <IoRadioOutline />
-              {aboutHero.kicker}
-            </div>
 
-            <h1 class="mt-8 max-w-3xl text-3xl font-black leading-none md:text-5xl">
-              {aboutHero.title}
-            </h1>
-
-            <p class="mt-6 max-w-2xl text-lg leading-8 opacity-75">
-              {aboutHero.description}
-            </p>
-
-            <div class="mt-8 flex flex-wrap gap-3">
-              <a
-                href={aboutLinks.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="about-link inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
-              >
-                <IoLogoGithub />
-                GitHub
-              </a>
-              <a
-                href={aboutLinks.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="about-link inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
-              >
-                <IoLogoInstagram />
-                Instagram
-              </a>
-            </div>
-          </div>
-
-          <aside class="flex flex-col justify-between gap-8 border-t border-slate-300 pt-8 dark:border-zinc-700 md:border-t-0 md:border-l md:pl-8 md:pt-0">
-            <div>
-              <p class="text-xs font-bold uppercase tracking-[0.18em] text-orange-500">
-                Current mode
-              </p>
-              <p class="mt-4 text-2xl font-black leading-tight">
-                {aboutHero.mode}
-              </p>
-            </div>
-
-            <div class="about-rule"></div>
-
-            <div class="space-y-5 text-sm opacity-65">
-              {
-                aboutFragments.map((fragment) => (
-                  <p class="border-l-2 border-emerald-500/70 pl-3">{fragment}</p>
-                ))
-              }
-            </div>
+  <main class="about">
+    <Content className="about-shell">
+      <header class="about-hero">
+        <p class="about-label">{aboutHero.kicker}</p>
+        <h1>{aboutHero.title}</h1>
+        <div class="about-hero__details">
+          <p>{aboutHero.description}</p>
+          <aside>
+            <span>Current mode</span>
+            <strong>{aboutHero.mode}</strong>
           </aside>
         </div>
-      </section>
+        <nav class="about-links" aria-label="Social links">
+          <a href={aboutLinks.github} target="_blank" rel="noopener noreferrer">
+            GitHub ↗
+          </a>
+          <a
+            href={aboutLinks.instagram}
+            target="_blank"
+            rel="noopener noreferrer">Instagram ↗</a
+          >
+        </nav>
+      </header>
 
-      <section
-        id="about-details"
-        class="mt-10 grid scroll-mt-24 gap-4 md:grid-cols-3"
-      >
-        {
-          aboutPrinciples.map((principle, index) => (
-            <article class="about-card rounded-lg p-5">
-              <div class="about-index text-sm font-black">
-                0{index + 1}
-              </div>
-              <h2 class="mt-5 text-xl font-black leading-tight">
-                {principle.title}
-              </h2>
-              <p class="mt-3 text-sm leading-6 opacity-75">{principle.body}</p>
-            </article>
-          ))
-        }
-      </section>
-
-      <section class="mt-10 grid min-w-0 gap-6 border-y border-slate-300 py-8 dark:border-zinc-700 md:grid-cols-[0.7fr_1.3fr]">
-        <div>
-          <div class="inline-flex size-11 items-center justify-center rounded-full bg-orange-500 text-xl text-white dark:text-zinc-950">
-            <IoCodeSlash />
-          </div>
-          <h2 class="mt-5 text-2xl font-black">Working vocabulary</h2>
-        </div>
-
-        <div class="min-w-0 space-y-5">
+      <section class="about-section about-principles">
+        <h2>Working principles</h2>
+        <div class="about-principles__list">
           {
-            aboutCapabilityRows.map((row, rowIndex) => {
-              const loopItems = [...row.items, ...row.items];
-
-              return (
-                <div>
-                  <p class="mb-2 text-xs font-black uppercase tracking-[0.18em] text-orange-500">
-                    {row.label}
-                  </p>
-                  <div
-                    class:list={[
-                      "about-vocab-marquee",
-                      { "about-vocab-marquee-reverse": rowIndex % 2 === 1 },
-                    ]}
-                    aria-label={`${row.label} vocabulary`}
-                  >
-                    <div class="about-vocab-track">
-                      {[...loopItems, ...loopItems].map((capability) => {
-                        const Icon = capabilityIcons[capability.icon];
-
-                        return (
-                          <span
-                            class="about-vocab-item"
-                            aria-label={capability.label}
-                            tabindex="0"
-                          >
-                            <span class="about-vocab-icon" aria-hidden="true">
-                              <Icon />
-                            </span>
-                            <span class="about-vocab-label">
-                              {"shortLabel" in capability
-                                ? capability.shortLabel
-                                : capability.label}
-                            </span>
-                          </span>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              );
-            })
+            aboutPrinciples.map((principle, index) => (
+              <article>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <h3>{principle.title}</h3>
+                <p>{principle.body}</p>
+              </article>
+            ))
           }
         </div>
       </section>
 
-      <section class="mt-10 grid items-start gap-6 md:grid-cols-2">
-        <div class="about-stack-section">
-          <p class="about-section-kicker">Education</p>
-          <div class="mt-5 space-y-4">
+      <section class="about-section about-vocabulary">
+        <h2>Working vocabulary</h2>
+        <div class="about-vocabulary__rows">
+          {
+            aboutCapabilityRows.map((row) => (
+              <div>
+                <h3>{row.label}</h3>
+                <p>{row.items.map((item) => item.label).join(" · ")}</p>
+              </div>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="about-section about-notes">
+        <h2>Notes from the desk</h2>
+        <ul>
+          {aboutFragments.map((fragment) => <li>{fragment}</li>)}
+        </ul>
+      </section>
+
+      <section class="about-section about-history">
+        <h2>History</h2>
+        <div class="about-history__columns">
+          <div>
+            <h3 class="about-subheading">Work</h3>
             {
-              aboutEducation.map((entry) => (
-                <article class="about-timeline-item about-timeline-item-plain">
-                  <div class="min-w-0">
-                    <div class="about-entry-header">
-                      <div class="min-w-0">
-                        <h2 class="text-xl font-black leading-tight">
-                          {entry.title}
-                        </h2>
-                        <p class="mt-1 text-sm font-bold text-orange-600 dark:text-orange-400">
-                          {entry.place}
-                        </p>
-                      </div>
-                      <div class="about-entry-meta">
-                        <span class="text-xs font-black uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-400">
-                          {entry.period}
-                        </span>
-                        {
-                          "image" in entry && (
-                          <div class="about-entry-logo">
-                            <Image
-                              src={entry.image}
-                              alt={entry.imageAlt}
-                              width={58}
-                              loading="lazy"
-                              decoding="async"
-                            />
-                          </div>
-                          )
-                        }
-                      </div>
-                    </div>
-                    <p class="mt-3 text-sm leading-6 opacity-75">
-                      {entry.body}
-                    </p>
-                  </div>
+              aboutWorkExperience.map((entry) => (
+                <article class="about-entry">
+                  <time>{entry.period}</time>
+                  <h4>{entry.title}</h4>
+                  <p class="about-entry__place">{entry.place}</p>
+                  <p>{entry.body}</p>
                 </article>
               ))
             }
           </div>
-        </div>
 
-        <div class="about-stack-section">
-          <p class="about-section-kicker">Work Experience</p>
-          <div class="mt-5 space-y-4">
+          <div>
+            <h3 class="about-subheading">Education</h3>
             {
-              aboutWorkExperience.map((entry) => (
-                <article class="about-timeline-item">
-                  <div class="about-timeline-dot"></div>
+              aboutEducation.map((entry) => (
+                <article class="about-entry about-entry--education">
+                  {"image" in entry && (
+                    <Image
+                      src={entry.image}
+                      alt={entry.imageAlt}
+                      width={56}
+                      loading="lazy"
+                    />
+                  )}
                   <div>
-                    <div class="flex flex-wrap items-baseline justify-between gap-2">
-                      <h2 class="text-xl font-black leading-tight">
-                        {entry.title}
-                      </h2>
-                      <span class="text-xs font-black uppercase tracking-[0.16em] text-emerald-600 dark:text-emerald-400">
-                        {entry.period}
-                      </span>
-                    </div>
-                    <p class="mt-1 text-sm font-bold text-orange-600 dark:text-orange-400">
-                      {entry.place}
-                    </p>
-                    <p class="mt-3 text-sm leading-6 opacity-75">
-                      {entry.body}
-                    </p>
+                    <time>{entry.period}</time>
+                    <h4>{entry.title}</h4>
+                    <p class="about-entry__place">{entry.place}</p>
+                    <p>{entry.body}</p>
                   </div>
                 </article>
               ))
@@ -288,59 +137,7 @@ const aboutSideProjects = sideProjectEntries
 
       <SideProjects projects={aboutSideProjects} />
     </Content>
-
-    <div
-      class="scroll-indicator"
-      aria-hidden="true"
-      data-scroll-indicator
-    >
-      <span class="scroll-indicator__text">Scroll</span>
-      <span
-        class="scroll-indicator__mouse"
-        aria-hidden="true"
-      >
-        <span class="scroll-indicator__wheel"></span>
-      </span>
-    </div>
   </main>
+
+  <Footer />
 </MainLayout>
-
-<script>
-  let cleanupScrollIndicator = () => {};
-
-  const setupScrollIndicator = () => {
-    cleanupScrollIndicator();
-
-    const indicator = document.querySelector<HTMLElement>(
-      "[data-scroll-indicator]",
-    );
-
-    if (!indicator) return;
-
-    const updateVisibility = () => {
-      const canScroll =
-        document.documentElement.scrollHeight > window.innerHeight + 80;
-      const scrollBottom = window.scrollY + window.innerHeight;
-      const isAtEnd = scrollBottom >= document.documentElement.scrollHeight - 80;
-
-      indicator.classList.toggle(
-        "scroll-indicator--hidden",
-        !canScroll || isAtEnd,
-      );
-    };
-
-    updateVisibility();
-    window.addEventListener("scroll", updateVisibility, { passive: true });
-    window.addEventListener("resize", updateVisibility);
-
-    cleanupScrollIndicator = () => {
-      window.removeEventListener("scroll", updateVisibility);
-      window.removeEventListener("resize", updateVisibility);
-      cleanupScrollIndicator = () => {};
-    };
-  };
-
-  setupScrollIndicator();
-  document.addEventListener("astro:page-load", setupScrollIndicator);
-  document.addEventListener("astro:before-swap", cleanupScrollIndicator);
-</script>

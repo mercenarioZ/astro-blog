@@ -4,7 +4,7 @@ description: Static routes, content modules, islands, and multi-framework compon
 slug: astro-blog
 tags:
   - tech
-heroImage: astro-blog/hero.svg
+heroImage: astro-blog/hero-v2.svg
 createdAt: 2026-06-17
 layout: ../../layouts/BlogPost.astro
 ---

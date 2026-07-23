@@ -51,7 +51,7 @@ const labels = { light: "Use light theme", dark: "Use dark theme" };
     </button>
   </div>
 
-  <div v-else class="h-9 w-[74px] shrink-0" aria-hidden="true"></div>
+  <div v-else class="theme-toggle-placeholder" aria-hidden="true"></div>
 </template>
 
 <style scoped src="../../styles/theme-toggle.css"></style>

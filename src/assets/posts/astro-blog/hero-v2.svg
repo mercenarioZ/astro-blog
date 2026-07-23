@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="742" viewBox="0 0 1200 742" role="img" aria-labelledby="title desc">
+  <title id="title">Astro content system editorial illustration</title>
+  <desc id="desc">Paper modules for routes, content, and islands connected by fine technical rules.</desc>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="5" r="1" fill="#29231d" opacity=".035"/>
+      <circle cx="17" cy="13" r=".8" fill="#29231d" opacity=".035"/>
+      <circle cx="9" cy="21" r=".7" fill="#29231d" opacity=".03"/>
+    </pattern>
+    <filter id="paper-shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#29231d" flood-opacity=".14"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="742" fill="#f6edda"/>
+  <rect width="1200" height="742" fill="url(#grain)"/>
+
+  <path d="M94 122H1106M94 620H1106" stroke="#29231d" stroke-width="2"/>
+  <text x="94" y="91" fill="#29231d" font-family="Georgia,serif" font-size="24" font-weight="700">A small publishing system</text>
+  <text x="1106" y="91" text-anchor="end" fill="#786d60" font-family="monospace" font-size="14" letter-spacing="3">STATIC BY DEFAULT</text>
+
+  <g filter="url(#paper-shadow)">
+    <path d="M124 180H430V526H124Z" fill="#efe1c8"/>
+    <path d="M447 148H760V554H447Z" fill="#fbf4e5"/>
+    <path d="M780 203H1073V501H780Z" fill="#eadbc2"/>
+  </g>
+
+  <g font-family="monospace">
+    <text x="158" y="224" fill="#b54d2e" font-size="15" font-weight="700" letter-spacing="3">ROUTES</text>
+    <text x="158" y="274" fill="#29231d" font-size="23">/</text>
+    <text x="158" y="322" fill="#29231d" font-size="23">/about</text>
+    <text x="158" y="370" fill="#29231d" font-size="23">/posts/[slug]</text>
+    <path d="M158 400H394" stroke="#786d60" stroke-width="1"/>
+    <text x="158" y="440" fill="#786d60" font-size="15">pages → HTML</text>
+
+    <text x="483" y="194" fill="#b54d2e" font-size="15" font-weight="700" letter-spacing="3">CONTENT</text>
+    <text x="483" y="254" fill="#29231d" font-size="21">---</text>
+    <text x="483" y="298" fill="#29231d" font-size="21">title</text>
+    <text x="483" y="342" fill="#29231d" font-size="21">tags</text>
+    <text x="483" y="386" fill="#29231d" font-size="21">createdAt</text>
+    <text x="483" y="430" fill="#29231d" font-size="21">layout</text>
+    <text x="483" y="474" fill="#29231d" font-size="21">---</text>
+
+    <text x="816" y="248" fill="#b54d2e" font-size="15" font-weight="700" letter-spacing="3">ISLANDS</text>
+    <circle cx="926" cy="350" r="74" fill="#768271"/>
+    <circle cx="926" cy="350" r="38" fill="#f6edda"/>
+    <path d="M904 350H948M926 328V372" stroke="#29231d" stroke-width="6"/>
+    <text x="816" y="458" fill="#786d60" font-size="15">JavaScript, only where needed</text>
+  </g>
+
+  <path d="M430 350H447M760 350H780" stroke="#b54d2e" stroke-width="3"/>
+  <circle cx="438" cy="350" r="5" fill="#b54d2e"/>
+  <circle cx="770" cy="350" r="5" fill="#b54d2e"/>
+  <circle cx="1106" cy="620" r="7" fill="#b54d2e"/>
+</svg>

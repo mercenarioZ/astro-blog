@@ -1,0 +1,47 @@
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
+/* Hallmark · genre: editorial · macrostructure: Index-First · theme: Editorial
+ * design-system: design.md · designed-as-app
+ */
+
+.not-found {
+  min-height: 62dvh;
+  padding-block-start: calc(var(--banner-height) + var(--space-3xl));
+}
+
+.not-found .content-shell {
+  max-width: 50rem;
+}
+
+.not-found__code {
+  margin-block-end: var(--space-md);
+  color: var(--color-accent);
+  font-family: var(--font-outlier);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.not-found h1 {
+  max-width: 14ch;
+  font-size: var(--text-display);
+}
+
+.not-found h1 + p {
+  max-width: 44ch;
+  margin-block-start: var(--space-lg);
+  color: var(--color-ink-2);
+  font-size: var(--text-md);
+}
+
+.not-found a {
+  display: inline-flex;
+  margin-block-start: var(--space-lg);
+  color: var(--color-accent-hover);
+  font-weight: 700;
+  text-decoration-color: var(--color-accent);
+  white-space: nowrap;
+}
+
+.not-found a:hover {
+  color: var(--color-accent);
+}

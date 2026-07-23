@@ -5,7 +5,7 @@ slug: vue-start
 tags:
   - notes
   - vue
-heroImage: vue-start/hero.png
+heroImage: vue-start/hero-v2.webp
 createdAt: 2026-07-04
 layout: ../../layouts/BlogPost.astro
 ---

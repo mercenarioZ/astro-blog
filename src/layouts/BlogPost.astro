@@ -2,7 +2,6 @@
 import "../../styles/blog-post.css";
 import { Image } from "astro:assets";
 import Header from "../components/Header.astro";
-import Content from "../components/Content.astro";
 import Footer from "../components/Footer.astro";
 import { getPostImage } from "../lib/images";
 import MainLayout from "./MainLayout.astro";
@@ -15,22 +14,21 @@ export interface Props {
     updatedAt?: string;
     heroImage?: string;
     tags?: string[];
+    tag?: string[];
   };
 }
 
-const {
-  content: { title, description, heroImage, createdAt },
-} = Astro.props;
+const { content } = Astro.props;
+const { title, description, heroImage, createdAt } = content;
+const tags = content.tags ?? content.tag ?? [];
 const resolvedHeroImage = heroImage ? getPostImage(heroImage) : undefined;
 
-const formattedDate = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
+const formattedDate = (dateStr: string) =>
+  new Intl.DateTimeFormat("en", {
     year: "numeric",
     month: "long",
     day: "numeric",
-  });
-};
+  }).format(new Date(dateStr));
 ---
 
 <MainLayout
@@ -41,51 +39,48 @@ const formattedDate = (dateStr: string) => {
 >
   <Header />
 
-  <main class="pt-[50px]">
-    <Content className="markdown-body pt-4">
-      <div class="post-enter post-enter-hero mb-6 flex justify-center">
-        {
-          resolvedHeroImage && (
-            <div class="w-full max-w-[960px]">
-              {typeof resolvedHeroImage === "string" ? (
-                <img
-                  src={resolvedHeroImage}
-                  alt={title}
-                  width="1200"
-                  height="742"
-                  class="mx-auto block h-auto max-h-[70vh] w-auto max-w-full object-contain mb-0 border-0 rounded-none shadow-none"
-                  loading="eager"
-                  decoding="async"
-                />
-              ) : (
-                <Image
-                  src={resolvedHeroImage}
-                  alt={title}
-                  width={960}
-                  class="mx-auto block h-auto max-h-[70vh] w-auto max-w-full object-contain mb-0 border-0 rounded-none shadow-none"
-                  loading="eager"
-                  decoding="async"
-                />
-              )}
-            </div>
-          )
-        }
-      </div>
+  <main class="post">
+    <article class="markdown-body">
+      <header class="post-header">
+        <div class="post-header__meta">
+          {createdAt && <time>{formattedDate(createdAt)}</time>}
+          {tags.length > 0 && <span>{tags.join(" · ")}</span>}
+        </div>
 
-      <div class="post-enter post-enter-meta">
-        {createdAt && <p class="post-date"><i>{formattedDate(createdAt)}</i></p>}
-      </div>
+        <h1>{title}</h1>
+        <p class="post-header__description">{description}</p>
+      </header>
 
-      <div class="post-enter post-enter-title mb-4 flex flex-col items-center">
-        <h1 class="font-bold text-3xl mb-4">{title}</h1>
-        <div class="opacity-75">{description}</div>
-      </div>
+      {
+        resolvedHeroImage && (
+          <figure class="post-hero">
+            {typeof resolvedHeroImage === "string" ? (
+              <img
+                src={resolvedHeroImage}
+                alt={title}
+                width="1200"
+                height="742"
+                loading="eager"
+                decoding="async"
+              />
+            ) : (
+              <Image
+                src={resolvedHeroImage}
+                alt={title}
+                width={960}
+                loading="eager"
+                decoding="async"
+              />
+            )}
+          </figure>
+        )
+      }
 
-      <!-- <hr class="my-4 border-top border-zinc-600" /> -->
-      <div class="post-enter post-enter-content pt-4">
+      <div class="post-content">
         <slot />
       </div>
-    </Content>
+    </article>
   </main>
+
   <Footer />
 </MainLayout>

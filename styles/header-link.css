@@ -1,13 +1,23 @@
 .nav-link {
   display: inline-flex;
+  min-height: 2.5rem;
   align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  cursor: pointer;
+  gap: var(--space-2xs);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration-color: transparent;
+  text-decoration-thickness: var(--rule-hair);
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: var(--color-accent-hover);
+  text-decoration-color: currentColor;
 }
 
 .nav-link.active {
-  color: orange;
-  font-weight: bolder;
-  text-decoration: underline;
+  color: var(--color-accent);
+  text-decoration-color: currentColor;
 }

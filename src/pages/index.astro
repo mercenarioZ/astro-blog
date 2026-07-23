@@ -8,59 +8,38 @@ import { SITE_DESCRIPTION } from "../config";
 import MainLayout from "../layouts/MainLayout.astro";
 import { getPosts } from "../lib/posts";
 
-const [featuredPost, ...secondaryPosts] = getPosts();
-const leftAsidePosts = secondaryPosts.slice(0, 2);
-const rightAsidePosts = secondaryPosts.slice(2, 4);
-const remainingPosts = secondaryPosts.slice(4);
+const posts = getPosts();
 ---
 
 <MainLayout description={SITE_DESCRIPTION} title="MercenarioZ's blog">
   <Header />
-  <main class="pt-[70px]">
-    <Content className="max-w-[1320px] mt-16">
-      <h1 class="sr-only">MercenarioZ's blog</h1>
-      <section id="fade-target">
-        <div
-          class="grid grid-cols-1 gap-8 lg:grid-cols-[repeat(16,minmax(0,1fr))] lg:gap-6 xl:gap-8"
-        >
-          <aside
-            class="magazine-card magazine-card-left order-2 space-y-8 border-t border-slate-400 pt-8 dark:border-zinc-600 lg:order-1 lg:col-span-4 lg:border-t-0 lg:border-r lg:pr-6 xl:pr-8"
-          >
-            {leftAsidePosts.map((post) => <PostCard post={post} />)}
-          </aside>
 
-          {featuredPost && <PostCard post={featuredPost} variant="featured" />}
+  <main class="home">
+    <Content>
+      <header class="home-intro">
+        <p class="home-intro__edition">Independent notes · Ho Chi Minh City</p>
+        <h1>Software, tools, and the life around them.</h1>
+        <p class="home-intro__lede">
+          A working archive by MercenarioZ—written while building, breaking,
+          and learning in public.
+        </p>
+      </header>
 
-          <aside
-            class="magazine-card magazine-card-right order-3 space-y-8 border-t border-slate-400 pt-8 dark:border-zinc-600 lg:col-span-4 lg:border-t-0 lg:border-l lg:pl-6 xl:pl-8"
-          >
-            {rightAsidePosts.map((post) => <PostCard post={post} />)}
-          </aside>
+      <section class="post-index" aria-labelledby="archive-title">
+        <div class="post-index__heading">
+          <h2 id="archive-title">The archive</h2>
+          <p>{posts.length} entries, newest first</p>
         </div>
 
-        {
-          remainingPosts.length > 0 && (
-            <section class="mt-16 border-t border-slate-300 pt-10 dark:border-zinc-700">
-              <div class="mb-8 flex items-center justify-between gap-6">
-                <h2 class="text-2xl font-bold leading-tight">Latest</h2>
-                <span class="text-sm font-medium opacity-60">
-                  {remainingPosts.length} more
-                </span>
-              </div>
-
-              <ul class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {remainingPosts.map((post, index) => (
-                  <li
-                    class="magazine-card"
-                    style={`animation-delay: ${300 + index * 80}ms`}
-                  >
-                    <PostCard post={post} variant="latest" />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )
-        }
+        <ol class="post-index__list">
+          {
+            posts.map((post, index) => (
+              <li>
+                <PostCard post={post} index={index + 1} />
+              </li>
+            ))
+          }
+        </ol>
       </section>
     </Content>
   </main>

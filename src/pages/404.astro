@@ -1,6 +1,7 @@
 ---
-import { IoChevronForward } from "react-icons/io5";
+import "../../styles/not-found.css";
 import Content from "../components/Content.astro";
+import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import MainLayout from "../layouts/MainLayout.astro";
 ---
@@ -12,16 +13,14 @@ import MainLayout from "../layouts/MainLayout.astro";
 >
   <Header />
 
-  <main class="pt-[50px]">
-    <Content className="flex flex-col gap-4 items-center mt-10">
-      <h1 class="text-3xl mt-14 mb-6">Oops! Might be some typo mistakes...</h1>
-
-      <a
-        href="/"
-        class="inline-flex items-center gap-1 underline underline-offset-2 opacity-70 hover:opacity-90 transition"
-      >
-        Go back to home page <IoChevronForward />
-      </a>
+  <main class="not-found">
+    <Content>
+      <p class="not-found__code">404 · misplaced page</p>
+      <h1>This note isn’t in the archive.</h1>
+      <p>It may have moved, or the address may have a typo.</p>
+      <a href="/">Return to the archive →</a>
     </Content>
   </main>
+
+  <Footer />
 </MainLayout>

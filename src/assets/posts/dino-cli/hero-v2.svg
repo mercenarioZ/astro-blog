@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="742" viewBox="0 0 1200 742" role="img" aria-labelledby="title desc">
+  <title id="title">Dino local-first CLI workflow illustration</title>
+  <desc id="desc">Three paper stages show a Git diff becoming a proposed commit message while the user keeps control.</desc>
+  <defs>
+    <pattern id="grain" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="4" r=".8" fill="#29231d" opacity=".035"/>
+      <circle cx="19" cy="14" r=".7" fill="#29231d" opacity=".03"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-color="#29231d" flood-opacity=".14"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="742" fill="#f6edda"/>
+  <rect width="1200" height="742" fill="url(#grain)"/>
+  <path d="M88 104H1112M88 632H1112" stroke="#29231d" stroke-width="2"/>
+
+  <text x="88" y="78" fill="#29231d" font-family="Georgia,serif" font-size="23" font-weight="700">A small command, close to the work</text>
+  <text x="1112" y="78" text-anchor="end" fill="#786d60" font-family="monospace" font-size="14" letter-spacing="3">LOCAL-FIRST</text>
+
+  <g filter="url(#shadow)">
+    <path d="M112 210H382V526H112Z" fill="#eadcc4"/>
+    <path d="M465 168H735V568H465Z" fill="#fbf4e5"/>
+    <path d="M818 210H1088V526H818Z" fill="#eadcc4"/>
+  </g>
+
+  <g font-family="monospace">
+    <text x="146" y="258" fill="#b54d2e" font-size="15" font-weight="700" letter-spacing="3">01 · DIFF</text>
+    <path d="M146 300H348" stroke="#786d60" stroke-width="1"/>
+    <text x="146" y="350" fill="#768271" font-size="24">+ added</text>
+    <text x="146" y="401" fill="#b54d2e" font-size="24">− removed</text>
+    <text x="146" y="470" fill="#29231d" font-size="18">git diff</text>
+
+    <text x="499" y="218" fill="#b54d2e" font-size="15" font-weight="700" letter-spacing="3">02 · ASK</text>
+    <circle cx="600" cy="348" r="82" fill="#768271"/>
+    <path d="M559 341C559 303 590 278 625 288C654 297 665 329 650 355C636 379 608 382 592 366C579 354 584 332 602 325C615 320 627 331 623 343" fill="none" stroke="#f6edda" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="624" cy="343" r="7" fill="#b54d2e"/>
+    <text x="535" y="478" fill="#29231d" font-size="18">dino commit</text>
+
+    <text x="852" y="258" fill="#b54d2e" font-size="15" font-weight="700" letter-spacing="3">03 · PROPOSE</text>
+    <path d="M852 300H1054" stroke="#786d60" stroke-width="1"/>
+    <text x="852" y="352" fill="#29231d" font-size="20">build(cli):</text>
+    <text x="852" y="390" fill="#29231d" font-size="20">update module</text>
+    <text x="852" y="428" fill="#29231d" font-size="20">path</text>
+    <path d="M852 470H1054" stroke="#b54d2e" stroke-width="3"/>
+  </g>
+
+  <path d="M382 368H465M735 368H818" stroke="#29231d" stroke-width="2"/>
+  <path d="M447 356L465 368L447 380M800 356L818 368L800 380" fill="none" stroke="#29231d" stroke-width="2"/>
+
+  <text x="600" y="612" text-anchor="middle" fill="#786d60" font-family="monospace" font-size="15" letter-spacing="2">YOU REVIEW · YOU DECIDE</text>
+  <circle cx="88" cy="632" r="7" fill="#b54d2e"/>
+</svg>
