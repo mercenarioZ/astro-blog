@@ -1,16 +1,16 @@
-import { INSTAGRAM_URL } from "../config";
+import { INSTAGRAM_URL, GITHUB_URL } from "../config";
 import hcmutLogo from "../assets/about/hcmut-logo.png";
 
 export const aboutHero = {
   kicker: "Portfolio",
-  title: "Le Ba Nguyen Vu (MercenarioZ) is trying to be niche, lol",
+  title: "I'm MercenarioZ btw",
   description:
     "Software-leaning maker, blog keeper, and interface minimalist. I care about pages that load quickly, typography that behaves, and software that feels like it was tuned by someone who actually uses it.",
   mode: "Learning architecture. Building productivity utilities.",
 };
 
 export const aboutLinks = {
-  github: "https://github.com/mercenarioZ",
+  github: GITHUB_URL,
   instagram: INSTAGRAM_URL,
 };
 

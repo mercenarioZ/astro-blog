@@ -8,13 +8,14 @@ a framework component is useful.
 
 - **Astro** provides routing, layouts, Markdown rendering, content collections,
   and the production build.
-- **Tailwind CSS** provides utility classes, with page-specific CSS for more
-  involved visual treatments.
+- **Tailwind CSS** provides utility classes and design tokens, with
+  page-specific CSS for more involved visual treatments.
 - **Vue** powers the interactive theme selector and server-renders the side
   project cards.
 - **React** supports static icon rendering and the optional Mermaid diagram
   component.
-- **MDX** is enabled for posts that need embedded components.
+- **MDX** is enabled for posts that need embedded components; the current posts
+  are Markdown.
 
 ## Project structure
 
@@ -28,6 +29,7 @@ a framework component is useful.
 │   │   ├── posts/<slug>/       # Post-owned cover images
 │   │   └── social/             # Default social-card source image
 │   ├── components/             # Reusable Astro, Vue, and React components
+│   ├── composables/            # Client-side Vue behavior
 │   ├── content/
 │   │   └── side-projects/      # Markdown entries for the side-project grid
 │   ├── layouts/                # Shared document and article shells
@@ -38,22 +40,25 @@ a framework component is useful.
 │   ├── config.ts               # Site-wide values
 │   └── content.config.ts       # Astro content collection schemas
 ├── styles/                     # Global and route-specific styles
+├── design.md                   # Shared visual-system rules
 ├── astro.config.mjs            # Astro integrations and Tailwind plugin
-└── tailwind.config.mjs         # Tailwind scanning and dark-mode settings
+└── tailwind.config.mjs         # Tailwind configuration file
 ```
 
 ## How rendering works
 
 Astro renders pages and framework components to static HTML during the build.
-Browser JavaScript is added only when a component has a `client:*` directive.
+Framework components ship browser JavaScript only when they have a `client:*`
+directive. Astro's client router and ordinary `<script>` tags provide the small
+amount of browser behavior used elsewhere.
 
 ### Shared page shell
 
 `src/layouts/MainLayout.astro` is the outer document for every route. It
 combines:
 
-- `MainHead.astro` for metadata, social cards, view transitions, global CSS,
-  and the pre-render theme script.
+- `MainHead.astro` for metadata, social cards, the Astro client router, global
+  CSS, and the pre-render theme script.
 - `Body.astro` for shared body colors, typography, and dark-mode classes.
 - A page slot where each route supplies its header, content, and footer.
 
@@ -64,28 +69,27 @@ cover image, publication date, title, description, and Markdown content slot.
 
 ```text
 src/pages/posts/*.{md,mdx}
-        ├──────────────┐
-        ↓              ↓
+        ↓ import.meta.glob
 src/lib/posts.ts
-        ↓       src/lib/images.ts
-        └──────────────┘
-               ↓
+        ├──────→ src/lib/images.ts
+        ↓
 src/pages/index.astro
         ↓
 src/components/PostCard.astro
 ```
 
 `src/lib/posts.ts` eagerly loads post modules with `import.meta.glob`, sorts
-them newest-first, normalizes tags, and formats dates. The homepage selects one
-featured post, two posts for each side column, and places the rest in the
-latest-post grid. `PostCard.astro` renders the three card variants.
+them newest-first, resolves their hero images, normalizes tags, and formats
+dates. The homepage renders every post as a numbered archive row through
+`PostCard.astro`.
 
 ### Blog post flow
 
 Each Markdown or MDX file in `src/pages/posts/` becomes a route such as
 `src/pages/posts/dino-cli.md` → `/posts/dino-cli/`.
 
-Posts use frontmatter to provide the homepage and article metadata:
+Posts use frontmatter to provide the homepage and article metadata. These fields
+are expected by the loaders and layouts but are not currently schema-validated:
 
 ```yaml
 ---
@@ -132,7 +136,9 @@ The About page loads the collection with `getCollection`, sorts entries by
 ## Components and client JavaScript
 
 - `Header.astro` owns desktop/mobile navigation and persists across Astro page
-  transitions.
+  transitions. Its browser script handles the mobile menu and active links.
+- `MainHead.astro` installs Astro's client router and applies the saved or system
+  theme before the page paints.
 - `ThemeToggleButton.vue` uses `client:load`, so it is the main hydrated island
   shipped to the browser.
 - `SideProjects.vue` has no client directive and therefore renders as static
@@ -148,16 +154,21 @@ behavior.
 `styles/global.css` imports Tailwind and defines shared theme behavior. Other
 stylesheets are scoped by purpose:
 
-- `home.css` — homepage cards and entrance motion.
-- `blog-post.css` — Markdown typography and article motion.
-- `about.css` — portfolio panels, timelines, projects, and marquees.
+- `home.css` — homepage archive rows and responsive layout.
+- `blog-post.css` — article headers, media, and Markdown typography.
+- `about.css` — portfolio sections, history, and side projects.
 - `header-link.css` — active navigation states.
+- `theme-toggle.css` — the interactive light/dark selector.
+- `not-found.css` — the 404 route.
 
 Dark mode uses the `dark` class on `<html>`. The inline head script applies the
 saved or system theme before paint, and the Vue selector updates it afterward.
 Reduced-motion media queries disable nonessential animation.
 
 ## Development
+
+Use Node.js 22.12 or newer. The repository is pinned to npm 10.9.3 through its
+`packageManager` field.
 
 Install dependencies and start the local server:
 
@@ -176,4 +187,6 @@ Available commands:
 | `npm run astro -- <command>` | Run an Astro CLI command |
 
 The production output is written to `dist/` and can be served by any static
-hosting provider.
+hosting provider. GitHub Actions runs `npm ci` and `npm run build` for pull
+requests and pushes to `main`; Dependabot checks npm and GitHub Actions updates
+weekly.
