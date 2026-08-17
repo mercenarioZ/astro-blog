@@ -15,13 +15,6 @@ const labels = { light: "Use light theme", dark: "Use dark theme" };
     role="group"
     aria-label="Color theme"
   >
-    <span class="theme-toggle-atmosphere" aria-hidden="true">
-      <span class="theme-toggle-haze"></span>
-      <span class="theme-toggle-star theme-toggle-star-one"></span>
-      <span class="theme-toggle-star theme-toggle-star-two"></span>
-      <span class="theme-toggle-star theme-toggle-star-three"></span>
-    </span>
-
     <span class="theme-toggle-thumb" aria-hidden="true"></span>
 
     <button
@@ -35,17 +28,11 @@ const labels = { light: "Use light theme", dark: "Use dark theme" };
       ]"
       :aria-label="labels[item]"
       :aria-pressed="theme === item"
-      @click="selectTheme(item, $event)"
+      @click="selectTheme(item)"
     >
       <component
         :is="icons[item]"
         class="theme-toggle-icon"
-        :class="[
-          `theme-toggle-icon-${item}`,
-          theme === item
-            ? 'theme-toggle-icon-active'
-            : 'theme-toggle-icon-inactive',
-        ]"
         aria-hidden="true"
       />
     </button>
