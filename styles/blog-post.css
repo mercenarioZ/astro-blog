@@ -15,8 +15,12 @@
 }
 
 .post-header {
-  max-width: 54rem;
+  /* Match .post-content's width and font-size so `ch` resolves identically
+     and both blocks centre onto the same left edge. */
+  width: min(100%, var(--content-reading));
+  margin-inline: auto;
   padding-block: var(--space-xl) var(--space-2xl);
+  font-size: var(--text-md);
 }
 
 .post-header__meta {
@@ -58,15 +62,26 @@
 .post-content {
   width: min(100%, var(--content-reading));
   margin-inline: auto;
-  padding-block: var(--space-2xl);
+  padding-block: var(--space-xs);
   color: var(--color-ink-2);
   font-family: var(--font-body);
   font-size: var(--text-md);
   line-height: 1.68;
 }
 
-.post-content > * + * {
+.post-content>*+* {
   margin-block-start: var(--space-md);
+}
+
+/* The first element needs no top margin; it only stacks onto the padding. */
+.post-content> :first-child {
+  margin-block-start: 0;
+}
+
+/* Without a hero image, the header's bottom padding and the content's top
+   padding collapse into one oversized gap. */
+.markdown-body:not(:has(.post-hero)) .post-content {
+  padding-block-start: 0;
 }
 
 .post-content h1,
@@ -96,7 +111,7 @@
   padding-inline-start: var(--space-lg);
 }
 
-.post-content li + li {
+.post-content li+li {
   margin-block-start: var(--space-2xs);
 }
 
@@ -119,7 +134,7 @@
   font-size: var(--text-lg);
 }
 
-.post-content :not(pre) > code {
+.post-content :not(pre)>code {
   padding: var(--space-3xs) var(--space-2xs);
   background: var(--color-paper-3);
   color: var(--color-ink);
