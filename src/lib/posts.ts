@@ -2,7 +2,7 @@ import { getPostImage, type ImageSource } from "./images";
 
 interface PostFrontmatter<HeroImage> {
   createdAt: string;
-  heroImage: HeroImage;
+  heroImage?: HeroImage;
   tag?: string[];
   tags?: string[];
   title: string;
@@ -39,7 +39,9 @@ export const getPosts = () =>
       ...post,
       frontmatter: {
         ...post.frontmatter,
-        heroImage: getPostImage(post.frontmatter.heroImage),
+        heroImage: post.frontmatter.heroImage
+          ? getPostImage(post.frontmatter.heroImage)
+          : undefined,
       },
     }))
     .toSorted(
