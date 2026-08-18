@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="742" viewBox="0 0 1200 742" role="img" aria-labelledby="title desc">
+  <title id="title">libuv event loop editorial sheet</title>
+  <desc id="desc">The libuv loop phases and worker pool typeset as overlapping printed sheets.</desc>
+  <defs>
+    <pattern id="grain" width="22" height="22" patternUnits="userSpaceOnUse">
+      <circle cx="4" cy="7" r=".8" fill="#f6edda" opacity=".05"/>
+      <circle cx="15" cy="17" r=".7" fill="#f6edda" opacity=".04"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#0e0c0a" flood-opacity=".28"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="742" fill="#25211d"/>
+  <rect width="1200" height="742" fill="url(#grain)"/>
+  <path d="M87 96H1113M87 646H1113" stroke="#f6edda" stroke-width="1" opacity=".42"/>
+
+  <text x="87" y="72" fill="#f6edda" font-family="Georgia,serif" font-size="23" font-weight="700">One loop, many kernels</text>
+  <text x="1113" y="72" text-anchor="end" fill="#c9bda9" font-family="monospace" font-size="14" letter-spacing="3">LIBUV</text>
+
+  <g filter="url(#shadow)">
+    <path d="M142 154H662V576H142Z" fill="#f4e9d4"/>
+    <path d="M616 202H1057V530H616Z" fill="#dfcfb4"/>
+  </g>
+
+  <text x="176" y="230" fill="#b54d2e" font-family="monospace" font-size="23">uv__run_timers()</text>
+  <text x="176" y="284" fill="#29231d" font-family="monospace" font-size="23">uv__run_prepare()</text>
+  <text x="176" y="338" fill="#29231d" font-family="monospace" font-size="23">uv__io_poll()</text>
+  <text x="176" y="392" fill="#29231d" font-family="monospace" font-size="23">uv__run_check()</text>
+  <path d="M176 424H624" stroke="#867969" stroke-width="1"/>
+  <text x="176" y="474" fill="#29231d" font-family="Georgia,serif" font-size="34" font-weight="700">Handles are nouns.</text>
+  <text x="176" y="521" fill="#29231d" font-family="Georgia,serif" font-size="34" font-weight="700">Requests are verbs.</text>
+
+  <text x="668" y="286" fill="#b54d2e" font-family="Georgia,serif" font-size="104" font-weight="700">↻</text>
+  <text x="780" y="266" fill="#29231d" font-family="monospace" font-size="30">epoll</text>
+  <text x="780" y="337" fill="#29231d" font-family="monospace" font-size="30">kqueue</text>
+  <text x="780" y="408" fill="#29231d" font-family="monospace" font-size="30">IOCP</text>
+  <path d="M748 294H998M748 365H998M748 436H998" stroke="#867969" stroke-width="1"/>
+  <text x="748" y="486" fill="#5c5347" font-family="monospace" font-size="19">+ threadpool</text>
+
+  <path d="M93 129V176M70 152H116" stroke="#b54d2e" stroke-width="2"/>
+  <rect x="1032" y="553" width="22" height="48" fill="#b54d2e"/>
+  <circle cx="87" cy="646" r="7" fill="#768271"/>
+</svg>
