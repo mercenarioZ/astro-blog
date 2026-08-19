@@ -8,8 +8,6 @@ createdAt: 2026-08-19
 layout: ../../layouts/BlogPost.astro
 ---
 
-# ctags and etags finally clicked when I understood the index
-
 I used to think “Vim jumps to definitions” or “Emacs finds symbols.” That describes the interface, but not the mechanism.
 
 The mechanism starts with four terms:
