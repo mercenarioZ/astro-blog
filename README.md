@@ -86,7 +86,7 @@ dates. The homepage renders every post as a numbered archive row through
 ### Blog post flow
 
 Each Markdown or MDX file in `src/pages/posts/` becomes a route such as
-`src/pages/posts/dino-cli.md` → `/posts/dino-cli/`.
+`src/pages/posts/cli-vim.md` → `/posts/cli-vim/`.
 
 Posts use frontmatter to provide the homepage and article metadata. These fields
 are expected by the loaders and layouts but are not currently schema-validated:
