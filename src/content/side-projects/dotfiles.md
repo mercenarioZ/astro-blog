@@ -15,4 +15,4 @@ stack:
 order: 3
 ---
 
-One **portable configuration** for macOS, Linux, and Windows: a terminal stack built around Neovim, tmux, and Starship, with guarded symlink setup and no secrets in Git.
+Started as a small set of dotfiles to keep my terminal setup simple. After spending way too much time tweaking Neovim, tmux, and my shell, I figured it had earned a spot among my **side projects**.
