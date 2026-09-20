@@ -22,7 +22,6 @@ const { content } = Astro.props;
 const { title, description, heroImage, createdAt } = content;
 const tags = content.tags ?? content.tag ?? [];
 const resolvedHeroImage = heroImage ? getPostImage(heroImage) : undefined;
-
 const formattedDate = (dateStr: string) =>
   new Intl.DateTimeFormat("en", {
     year: "numeric",
@@ -67,7 +66,11 @@ const formattedDate = (dateStr: string) =>
               <Image
                 src={resolvedHeroImage}
                 alt={title}
-                width={960}
+                width={1200}
+                widths={[480, 768, 1200, 2400]}
+                sizes="(max-width: 1120px) calc(100vw - 2rem), 1088px"
+                format="webp"
+                quality={90}
                 loading="eager"
                 decoding="async"
               />

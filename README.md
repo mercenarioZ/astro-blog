@@ -97,11 +97,27 @@ title: Post title
 description: Short summary used on cards and in metadata
 tags:
   - tech
-heroImage: example-post/hero.jpg
+heroImage: example-post/hero-v2.webp
 createdAt: 2026-07-10
 layout: ../../layouts/BlogPost.astro
 ---
 ```
+
+Posts reference hero files relative to `src/assets/posts/`, for example
+`example-post/hero-v2.webp` or `example-post/cover.png`. Raster images (AVIF,
+JPEG, PNG, WebP) and SVGs are supported; the filename is not restricted.
+
+The article layout uses Astro's `<Image>` to resize and compress raster heroes
+as WebP at quality 90. Responsive variants at 480, 768, 1200, and 2400 pixels
+let the browser choose a suitable size for its viewport and pixel density.
+For sharp screenshots on dense displays, provide a sufficiently large source
+(for example, 2400×1484 for a 1200×742 composition). SVG heroes are served
+without rasterization. Raster social preview images are separately generated
+as 1200×630 JPEGs by `MainHead.astro`.
+
+The image registry eagerly imports all supported files in the post assets
+folder, so unused source captures may also be included in the build output.
+Keep large archival originals outside this folder when they are not needed.
 
 ### About page and content collection
 

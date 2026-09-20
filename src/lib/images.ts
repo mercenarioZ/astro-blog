@@ -6,6 +6,7 @@ type ImageModule = {
   default: ImageMetadata;
 };
 
+// Accept existing image names as well as versioned hero files.
 const rasterModules = import.meta.glob<ImageModule>(
   "../assets/posts/**/*.{avif,jpeg,jpg,png,webp}",
   { eager: true },
