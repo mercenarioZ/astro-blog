@@ -2,6 +2,7 @@ import { getPostImage, type ImageSource } from "./images";
 
 interface PostFrontmatter<HeroImage> {
   createdAt: string;
+  updatedAt?: string;
   heroImage?: HeroImage;
   tag?: string[];
   tags?: string[];
