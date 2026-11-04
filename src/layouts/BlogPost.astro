@@ -19,7 +19,7 @@ export interface Props {
 }
 
 const { content } = Astro.props;
-const { title, description, heroImage, createdAt } = content;
+const { title, description, heroImage, createdAt, updatedAt } = content;
 const tags = content.tags ?? content.tag ?? [];
 const resolvedHeroImage = heroImage ? getPostImage(heroImage) : undefined;
 
@@ -29,6 +29,10 @@ const formattedDate = (dateStr: string) =>
     month: "long",
     day: "numeric",
   }).format(new Date(dateStr));
+
+// YAML parses bare dates into Date objects, so normalise to YYYY-MM-DD.
+const isoDate = (dateStr: string) =>
+  new Date(dateStr).toISOString().slice(0, 10);
 ---
 
 <MainLayout
@@ -43,7 +47,8 @@ const formattedDate = (dateStr: string) =>
     <article class="markdown-body">
       <header class="post-header">
         <div class="post-header__meta">
-          {createdAt && <time>{formattedDate(createdAt)}</time>}
+          {createdAt && <time datetime={isoDate(createdAt)}>{formattedDate(createdAt)}</time>}
+          {updatedAt && <time datetime={isoDate(updatedAt)}>Updated {formattedDate(updatedAt)}</time>}
           {tags.length > 0 && <span>{tags.join(" · ")}</span>}
         </div>
 
