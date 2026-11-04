@@ -7,7 +7,7 @@
 // trace a path with the buttons.
 ---
 
-<div class="uv-loop" data-uv-loop>
+<div class="uv-loop" data-diagram>
   <figure class="uv-loop__figure">
     <div class="uv-loop__scroll">
       <svg class="uv-loop__svg" role="group" viewBox="196 -136 816 616" lang="en" aria-labelledby="uv-loop-title uv-loop-desc">
@@ -253,7 +253,7 @@
     <button
       type="button"
       aria-pressed="false"
-      data-uv-trace="callback"
+      data-diagram-trace="callback"
       data-steps="poll loop glue v8 js ticks promises"
       data-title="One I/O callback, end to end"
       data-detail="3 · Poll finds a finished read. libuv calls Node's C++ glue, Node enters V8, and V8 runs your callback to completion. When it returns, Node drains nextTick, then V8's promise queue, and only then does the loop move on."
@@ -261,7 +261,7 @@
     <button
       type="button"
       aria-pressed="false"
-      data-uv-trace="io"
+      data-diagram-trace="io"
       data-steps="poll check close timers"
       data-title="Inside an I/O callback: setImmediate wins, every time"
       data-detail="The callback is running in 3 · Poll. The very next stop is 4 · Check, where the immediate runs; 6 · Timers comes two steps later. Nothing about it is random."
@@ -269,15 +269,15 @@
     <button
       type="button"
       aria-pressed="false"
-      data-uv-trace="main"
+      data-diagram-trace="main"
       data-steps="main drain start pending idle poll check"
       data-title="From the main script: it depends on the clock"
       data-detail="setTimeout(0) is really 1 ms. If a millisecond has passed when uv_run() starts, the one-off timer pass fires it first. If not, the loop moves on; the idle handle Node started for the immediate stops 3 · Poll from sleeping, and 4 · Check runs it first."
     >immediate vs timeout, main script</button>
   </div>
-  <div class="uv-loop__panel" aria-live="polite" data-uv-panel>
-    <p class="uv-loop__panel-title" data-uv-title></p>
-    <p class="uv-loop__panel-text" data-uv-desc></p>
+  <div class="uv-loop__panel" aria-live="polite" data-diagram-panel>
+    <p class="uv-loop__panel-title" data-diagram-title></p>
+    <p class="uv-loop__panel-text" data-diagram-desc></p>
   </div>
 </div>
 
@@ -488,100 +488,5 @@
 </style>
 
 <script>
-  type Focus = {
-    key: string;
-    lit: Set<string>;
-    // A trace lights only the edges inside the path; a single step lights all of its edges.
-    trace: boolean;
-    title: string;
-    detail: string;
-  };
-
-  // Works on first load and after Astro's client-side navigation, and binds
-  // each figure only once.
-  const setup = () => {
-    for (const figure of document.querySelectorAll<HTMLElement>("[data-uv-loop]")) {
-      if (figure.hasAttribute("data-uv-ready")) continue;
-      figure.setAttribute("data-uv-ready", "true");
-
-      const svg = figure.querySelector("svg");
-      const panel = figure.querySelector("[data-uv-panel]");
-      const title = figure.querySelector("[data-uv-title]");
-      const description = figure.querySelector("[data-uv-desc]");
-      if (!svg || !panel || !title || !description) continue;
-
-      const steps = [...svg.querySelectorAll<SVGElement>("[data-step]")];
-      const edges = [...svg.querySelectorAll<SVGElement>("[data-edge-from]")];
-      const traces = [...figure.querySelectorAll<HTMLButtonElement>("[data-uv-trace]")];
-
-      let focus: Focus | null = null;
-
-      const isEdgeOn = (edge: SVGElement) => {
-        if (!focus) return false;
-        const from = focus.lit.has(edge.dataset.edgeFrom ?? "");
-        const to = focus.lit.has(edge.dataset.edgeTo ?? "");
-        return focus.trace ? from && to : from || to;
-      };
-
-      const render = () => {
-        figure.toggleAttribute("data-focus", focus !== null);
-        for (const step of steps) {
-          const id = step.dataset.step ?? "";
-          step.classList.toggle("is-on", focus?.lit.has(id) ?? false);
-          step.setAttribute("aria-pressed", String(focus?.key === id));
-        }
-        for (const edge of edges) {
-          edge.classList.toggle("is-on", isEdgeOn(edge));
-        }
-        for (const button of traces) {
-          button.setAttribute("aria-pressed", String(focus?.key === `trace:${button.dataset.uvTrace}`));
-        }
-        title.textContent = focus?.title ?? "";
-        description.textContent = focus?.detail ?? "";
-        panel.toggleAttribute("data-active", focus !== null);
-      };
-
-      // Choosing the same thing twice clears it.
-      const toggle = (next: Focus) => {
-        focus = focus?.key === next.key ? null : next;
-        render();
-      };
-
-      for (const step of steps) {
-        const id = step.dataset.step;
-        if (!id) continue;
-
-        const select = () =>
-          toggle({
-            key: id,
-            lit: new Set([id]),
-            trace: false,
-            title: step.getAttribute("aria-label") ?? "",
-            detail: step.dataset.detail ?? "",
-          });
-
-        step.addEventListener("click", select);
-        step.addEventListener("keydown", (event) => {
-          if (event.key !== "Enter" && event.key !== " ") return;
-          event.preventDefault();
-          select();
-        });
-      }
-
-      for (const button of traces) {
-        button.addEventListener("click", () =>
-          toggle({
-            key: `trace:${button.dataset.uvTrace}`,
-            lit: new Set(button.dataset.steps?.split(" ")),
-            trace: true,
-            title: button.dataset.title ?? "",
-            detail: button.dataset.detail ?? "",
-          }),
-        );
-      }
-    }
-  };
-
-  setup();
-  document.addEventListener("astro:page-load", setup);
+  import "./explorable";
 </script>
