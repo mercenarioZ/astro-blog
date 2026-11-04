@@ -1,16 +1,18 @@
 ---
 // One pass through uv_run(), drawn as a closed ring: 1-6 across the top and
 // back along the bottom, the liveness gate on the return path, the one-off
-// timer pass before the loop, and the microtask drain Node runs after every
-// callback. Click a step for details, or trace a path with the buttons.
+// timer pass before the loop, and the startup row that leads into uv_run(). The column on the right is everything outside
+// libuv on the same thread: Node's C++ glue, V8, your callback, and the
+// nextTick and promise queues drained after it. Click a step for details, or
+// trace a path with the buttons.
 ---
 
 <div class="uv-loop" data-uv-loop>
   <figure class="uv-loop__figure">
     <div class="uv-loop__scroll">
-      <svg class="uv-loop__svg" role="group" viewBox="196 -26 572 512" lang="en" aria-labelledby="uv-loop-title uv-loop-desc">
-        <title id="uv-loop-title">One pass through uv_run()</title>
-        <desc id="uv-loop-desc">Before the loop, due timers run once. Then the six steps of one uv_run() pass, numbered 1 to 6: pending callbacks, idle and prepare, poll, check, close callbacks, timers. The uv__loop_alive() gate on the return path either starts another pass or returns. After every JavaScript callback, Node drains the process.nextTick queue and then the Promise microtasks.</desc>
+      <svg class="uv-loop__svg" role="group" viewBox="196 -136 816 616" lang="en" aria-labelledby="uv-loop-title uv-loop-desc">
+        <title id="uv-loop-title">One pass through uv_run(), and what it calls into</title>
+        <desc id="uv-loop-desc">At startup, Node boots V8 and the libuv loop, V8 runs the main script to the end, and Node drains the nextTick and promise queues before calling uv_run(). Before the loop, due timers run once. Then the six steps of one uv_run() pass, numbered 1 to 6: pending callbacks, idle and prepare, poll, check, close callbacks, timers. The uv__loop_alive() gate on the return path either starts another pass or returns. Outside libuv, on the same thread: when a phase has a callback, libuv calls Node's C++ glue, Node enters V8, and V8 runs your JavaScript. When it returns, Node drains the process.nextTick queue, then V8's Promise microtasks, and control goes back to the loop. Async API calls go the other way, from Node down to libuv.</desc>
         <defs>
           <marker id="uv-loop-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
             <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
@@ -18,13 +20,17 @@
         </defs>
 
         <!-- Lanes -->
+        <rect x="212" y="-124" width="540" height="82" class="c-strip" stroke-width="1" />
+        <text x="226" y="-108" class="t-muted" font-size="9" font-weight="600">startup · once</text>
         <rect x="212" y="52" width="540" height="346" class="c-lane" stroke-width="1" />
         <text x="226" y="74" class="t-muted" font-size="10" font-weight="600">while loop</text>
-        <rect x="212" y="414" width="540" height="58" class="c-strip" stroke-width="1" />
-        <text x="226" y="439" class="t-primary" font-size="9" font-weight="600">After every callback,</text>
-        <text x="226" y="453" class="t-muted" font-size="8">Node drains until empty:</text>
+        <rect x="820" y="30" width="176" height="442" class="c-strip" stroke-width="1" />
+        <text x="836" y="48" class="t-muted" font-size="9" font-weight="600">outside libuv · same thread</text>
 
         <!-- Edges -->
+        <path data-edge-from="boot" data-edge-to="main" d="M 392.6 -76 L 432.6 -76" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="main" data-edge-to="drain" d="M 572.6 -76 L 612.6 -76" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="drain" data-edge-to="start" d="M 672.6 -54 L 672.6 11 L 392.6 11" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
         <path data-edge-from="start" data-edge-to="pending" d="M 322.6 36 L 322.6 86" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
         <path data-edge-from="check" data-edge-to="close" d="M 610.6 360 L 562.6 360" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
         <path data-edge-from="close" data-edge-to="timers" d="M 438.6 360 L 368.6 360" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
@@ -34,9 +40,36 @@
         <path data-edge-from="poll" data-edge-to="check" d="M 656.6 154 L 656.6 326" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
         <path data-edge-from="pending" data-edge-to="idle" d="M 392.6 120 L 424.6 120" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
         <path data-edge-from="timers" data-edge-to="gate" d="M 322.6 326 L 322.6 274" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
-        <path data-edge-from="ticks" data-edge-to="promises" d="M 560.6 443 L 592.6 443" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="loop" data-edge-to="glue" d="M 752 78 L 836 78" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="glue" data-edge-to="loop" d="M 836 100 L 752 100" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="glue" data-edge-to="v8" d="M 908 112 L 908 148" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="v8" data-edge-to="js" d="M 908 198 L 908 234" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="js" data-edge-to="ticks" d="M 908 284 L 908 320" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="ticks" data-edge-to="promises" d="M 908 370 L 908 406" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
+        <path data-edge-from="promises" data-edge-to="loop" d="M 836 431 L 740 431 L 740 398" class="a-default" stroke-width="1.4" marker-end="url(#uv-loop-arrowhead)" />
 
         <!-- Nodes -->
+        <g id="node-boot" data-step="boot" tabindex="0" role="button" aria-pressed="false" aria-label="Node boots — V8 and the libuv loop" data-detail="node main.js starts one process. On the main thread, Node sets up a V8 isolate and a libuv loop, then loads your script.">
+          <rect x="252.6" y="-98" width="140" height="44" class="c-mask" />
+          <rect x="252.6" y="-98" width="140" height="44" class="c-external" stroke-width="1.5" />
+          <text x="322.6" y="-79" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Node boots</text>
+          <text x="322.6" y="-65" class="t-muted" font-size="8" text-anchor="middle">V8 + libuv loop set up</text>
+        </g>
+
+        <g id="node-main" data-step="main" tabindex="0" role="button" aria-pressed="false" aria-label="Main script — V8 runs it to the end" data-detail="Your top-level code runs synchronously in V8. Each async call only registers work: timers go to Node's lists, fs work goes to libuv, promise reactions go to V8's queue.">
+          <rect x="432.6" y="-98" width="140" height="44" class="c-mask" />
+          <rect x="432.6" y="-98" width="140" height="44" class="c-external" stroke-width="1.5" />
+          <text x="502.6" y="-79" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Main script</text>
+          <text x="502.6" y="-65" class="t-muted" font-size="8" text-anchor="middle">V8 runs it to the end</text>
+        </g>
+
+        <g id="node-drain" data-step="drain" tabindex="0" role="button" aria-pressed="false" aria-label="Drain queues — nextTick, then promises" data-detail="When the script returns, Node empties the nextTick queue and V8's promise queue, the same drain that follows every callback. Only then does it call uv_run().">
+          <rect x="612.6" y="-98" width="120" height="44" class="c-mask" />
+          <rect x="612.6" y="-98" width="120" height="44" class="c-external" stroke-width="1.5" />
+          <text x="672.6" y="-79" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Drain queues</text>
+          <text x="672.6" y="-65" class="t-muted" font-size="8" text-anchor="middle">nextTick, promises</text>
+        </g>
+
         <g id="node-start" data-step="start" tabindex="0" role="button" aria-pressed="false" aria-label="uv_run() starts — timers run once" data-detail="Node calls uv_run() after your main script finishes. Before the while loop, libuv updates its clock and runs any timer that is already due, once. It is a backwards-compatibility leftover from libuv 1.45.0, and it decides the main-script setTimeout vs setImmediate race.">
           <rect x="252.6" y="-14" width="140" height="50" class="c-mask" />
           <rect x="252.6" y="-14" width="140" height="50" class="c-backend" stroke-width="1.5" />
@@ -133,18 +166,39 @@
           <text x="656.6" y="142" class="t-backend" font-size="8" text-anchor="middle">waits here</text>
         </g>
 
+        <g id="node-glue" data-step="glue" tabindex="0" role="button" aria-pressed="false" aria-label="Node C++ glue — bindings, MakeCallback" data-detail="Node's C++ layer between libuv and V8. Going down, it turns your async calls into libuv work: fs.readFile becomes uv_fs_read, and all timers share one uv_timer. Coming up, libuv calls it, and it enters V8.">
+          <rect x="836" y="62" width="144" height="50" class="c-mask" />
+          <rect x="836" y="62" width="144" height="50" class="c-external" stroke-width="1.5" />
+          <text x="908" y="84" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Node C++ glue</text>
+          <text x="908" y="98" class="t-muted" font-size="8" text-anchor="middle">bindings, MakeCallback</text>
+        </g>
+
+        <g id="node-v8" data-step="v8" tabindex="0" role="button" aria-pressed="false" aria-label="V8 — the call stack" data-detail="The JavaScript engine. It holds the call stack and the promise microtask queue, and knows nothing about the loop: Node tells it when to run.">
+          <rect x="836" y="148" width="144" height="50" class="c-mask" />
+          <rect x="836" y="148" width="144" height="50" class="c-external" stroke-width="1.5" />
+          <text x="908" y="170" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">V8</text>
+          <text x="908" y="184" class="t-muted" font-size="8" text-anchor="middle">call stack</text>
+        </g>
+
+        <g id="node-js" data-step="js" tabindex="0" role="button" aria-pressed="false" aria-label="Your JS callback — runs to completion" data-detail="Your setTimeout function, fs callback or setImmediate function. Nothing interrupts it. Any async API it calls goes back down through Node to libuv.">
+          <rect x="836" y="234" width="144" height="50" class="c-mask" />
+          <rect x="836" y="234" width="144" height="50" class="c-external" stroke-width="1.5" />
+          <text x="908" y="256" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Your JS callback</text>
+          <text x="908" y="270" class="t-muted" font-size="8" text-anchor="middle">runs to completion</text>
+        </g>
+
         <g id="node-ticks" data-step="ticks" tabindex="0" role="button" aria-pressed="false" aria-label="process.nextTick queue — Node, not libuv" data-detail="After each callback, in any phase, Node empties the whole nextTick queue first. It is not a libuv phase, so ticks that keep scheduling ticks can starve the loop.">
-          <rect x="410.6" y="424" width="150" height="38" class="c-mask" />
-          <rect x="410.6" y="424" width="150" height="38" class="c-external" stroke-width="1.5" />
-          <text x="485.6" y="440" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">process.nextTick</text>
-          <text x="485.6" y="453" class="t-muted" font-size="8" text-anchor="middle">Node's own queue</text>
+          <rect x="836" y="320" width="144" height="50" class="c-mask" />
+          <rect x="836" y="320" width="144" height="50" class="c-external" stroke-width="1.5" />
+          <text x="908" y="342" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">process.nextTick</text>
+          <text x="908" y="356" class="t-muted" font-size="8" text-anchor="middle">Node's own queue</text>
         </g>
 
         <g id="node-promises" data-step="promises" tabindex="0" role="button" aria-pressed="false" aria-label="Promise microtasks — V8's job queue" data-detail="Then V8 runs queued promise reactions: .then callbacks and await continuations. Node repeats ticks and promises until both queues are empty, and only then goes back to the loop.">
-          <rect x="592.6" y="424" width="140" height="38" class="c-mask" />
-          <rect x="592.6" y="424" width="140" height="38" class="c-external" stroke-width="1.5" />
-          <text x="662.6" y="440" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Promise microtasks</text>
-          <text x="662.6" y="453" class="t-muted" font-size="8" text-anchor="middle">V8's job queue</text>
+          <rect x="836" y="406" width="144" height="50" class="c-mask" />
+          <rect x="836" y="406" width="144" height="50" class="c-external" stroke-width="1.5" />
+          <text x="908" y="428" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">Promise microtasks</text>
+          <text x="908" y="442" class="t-muted" font-size="8" text-anchor="middle">V8's job queue</text>
         </g>
 
         <!-- Edge labels -->
@@ -156,14 +210,54 @@
           <rect x="385" y="220" width="53.2" height="14" class="c-mask" />
           <text x="411.6" y="230" class="t-muted" font-size="8" text-anchor="middle">not alive</text>
         </g>
+        <g data-edge-from="drain" data-edge-to="start">
+          <rect x="492" y="4" width="84" height="14" class="c-mask" />
+          <text x="534" y="14" class="t-muted" font-size="8" text-anchor="middle">calls uv_run()</text>
+        </g>
+        <g data-edge-from="loop" data-edge-to="glue">
+          <rect x="770" y="71" width="48" height="14" class="c-mask" />
+          <text x="794" y="81" class="t-muted" font-size="8" text-anchor="middle">calls back</text>
+        </g>
+        <g data-edge-from="glue" data-edge-to="loop">
+          <rect x="772" y="93" width="44" height="14" class="c-mask" />
+          <text x="794" y="103" class="t-muted" font-size="8" text-anchor="middle">schedules</text>
+        </g>
+        <g data-edge-from="glue" data-edge-to="v8">
+          <rect x="884" y="123" width="48" height="14" class="c-mask" />
+          <text x="908" y="133" class="t-muted" font-size="8" text-anchor="middle">enters V8</text>
+        </g>
+        <g data-edge-from="v8" data-edge-to="js">
+          <rect x="894" y="209" width="28" height="14" class="c-mask" />
+          <text x="908" y="219" class="t-muted" font-size="8" text-anchor="middle">runs</text>
+        </g>
+        <g data-edge-from="js" data-edge-to="ticks">
+          <rect x="884" y="295" width="48" height="14" class="c-mask" />
+          <text x="908" y="305" class="t-muted" font-size="8" text-anchor="middle">on return</text>
+        </g>
+        <g data-edge-from="ticks" data-edge-to="promises">
+          <rect x="896" y="381" width="24" height="14" class="c-mask" />
+          <text x="908" y="391" class="t-muted" font-size="8" text-anchor="middle">then</text>
+        </g>
+        <g data-edge-from="promises" data-edge-to="loop">
+          <rect x="754" y="424" width="68" height="14" class="c-mask" />
+          <text x="788" y="434" class="t-muted" font-size="8" text-anchor="middle">back to the loop</text>
+        </g>
       </svg>
     </div>
     <figcaption>
-      One pass in call order; only <code>uv__io_poll()</code> waits. Click a step for details, or trace a path below.
+      libuv's loop on the left, what it calls into on the right, all on one thread; only <code>uv__io_poll()</code> waits. Click a step for details, or trace a path below.
     </figcaption>
   </figure>
-  <div class="uv-loop__traces" role="group" aria-label="Trace setTimeout(0) against setImmediate">
-    <span>Trace setTimeout(0) vs setImmediate:</span>
+  <div class="uv-loop__traces" role="group" aria-label="Trace a path">
+    <span>Trace:</span>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-uv-trace="callback"
+      data-steps="poll loop glue v8 js ticks promises"
+      data-title="One I/O callback, end to end"
+      data-detail="3 · Poll finds a finished read. libuv calls Node's C++ glue, Node enters V8, and V8 runs your callback to completion. When it returns, Node drains nextTick, then V8's promise queue, and only then does the loop move on."
+    >a callback, end to end</button>
     <button
       type="button"
       aria-pressed="false"
@@ -171,15 +265,15 @@
       data-steps="poll check close timers"
       data-title="Inside an I/O callback: setImmediate wins, every time"
       data-detail="The callback is running in 3 · Poll. The very next stop is 4 · Check, where the immediate runs; 6 · Timers comes two steps later. Nothing about it is random."
-    >inside an I/O callback</button>
+    >immediate vs timeout, in I/O</button>
     <button
       type="button"
       aria-pressed="false"
       data-uv-trace="main"
-      data-steps="start pending idle poll check"
+      data-steps="main drain start pending idle poll check"
       data-title="From the main script: it depends on the clock"
       data-detail="setTimeout(0) is really 1 ms. If a millisecond has passed when uv_run() starts, the one-off timer pass fires it first. If not, the loop moves on; the idle handle Node started for the immediate stops 3 · Poll from sleeping, and 4 · Check runs it first."
-    >from the main script</button>
+    >immediate vs timeout, main script</button>
   </div>
   <div class="uv-loop__panel" aria-live="polite" data-uv-panel>
     <p class="uv-loop__panel-title" data-uv-title></p>
@@ -188,10 +282,10 @@
 </div>
 
 <style>
-  /* The ring is drawn compact, so a 48rem frame keeps its labels at reading
+  /* The drawing is compact, so a 68rem frame keeps its labels at reading
      size; below that the frame scrolls instead of shrinking them into the floor. */
   .uv-loop {
-    --uv-loop-frame: min(100vw - 2rem, 48rem);
+    --uv-loop-frame: min(100vw - 2rem, 68rem);
 
     width: var(--uv-loop-frame);
     margin-inline: calc((100% - var(--uv-loop-frame)) / 2);
@@ -211,7 +305,7 @@
   .uv-loop__svg {
     display: block;
     width: 100%;
-    min-width: 36rem;
+    min-width: 46rem;
     height: auto;
     font-family: var(--font-outlier);
   }

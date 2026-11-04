@@ -89,7 +89,7 @@ while (r != 0 && loop->stop_flag == 0) {
 }
 ```
 
-That is the whole event loop. Drawn in call order:
+That is the whole event loop. Below it is drawn in call order on the left, with what it calls into on the right: Node's C++ glue, V8, your callback, and the queues drained after it. All of it runs on one thread.
 
 <UvRunLoop />
 
@@ -102,7 +102,7 @@ Each async API has a fixed seat:
 
 ## Between libuv's callbacks: nextTick and promises
 
-The strip under the diagram is not libuv. After each callback libuv calls, Node empties the `nextTick` queue, then the promise queue, and repeats until both are empty. Only then does libuv move on.
+The bottom of the right-hand column is not libuv. After each callback libuv calls, Node empties the `nextTick` queue, then the promise queue, and repeats until both are empty. Only then does libuv move on.
 
 A "callback" is any time the loop calls into your JavaScript: the main script, one `setTimeout` function, one `fs.readFile` callback. Each counts separately, even inside one phase:
 
