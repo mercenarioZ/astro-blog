@@ -1,0 +1,237 @@
+---
+title: Node's async APIs, and the libuv loop underneath
+description: Why nextTick, promises, setTimeout and setImmediate run in the order they do
+slug: libuv
+tags:
+  - tech
+# heroImage: libuv/hero-v2.svg
+createdAt: 2026-08-18
+layout: ../../layouts/BlogPost.astro
+---
+
+import UvRunLoop from "../../components/diagrams/UvRunLoop.astro";
+
+## Six lines, one order
+
+```js
+setTimeout(() => console.log("setTimeout"), 0);
+setImmediate(() => console.log("setImmediate"));
+Promise.resolve().then(() => console.log("promise"));
+queueMicrotask(() => console.log("queueMicrotask"));
+process.nextTick(() => console.log("nextTick"));
+console.log("sync");
+```
+
+Run it as a CommonJS file on Node 24:
+
+```
+sync
+nextTick
+promise
+queueMicrotask
+setTimeout
+setImmediate
+```
+
+I used to memorise that list as a priority table. It is not one. There is no priority anywhere in Node. These six calls hand their callbacks to four different owners, and each owner empties its queue at a different moment. Once you know who owns what, the order stops being trivia.
+
+## Four owners
+
+| API | Owner | When it runs |
+| --- | --- | --- |
+| plain code | V8, the call stack | now, to completion |
+| `process.nextTick` | Node, in JavaScript | after every callback |
+| `Promise.then`, `await`, `queueMicrotask` | V8, the microtask queue | after every callback, after nextTick |
+| `setTimeout`, I/O, `setImmediate`, close events | libuv, the event loop | when the loop reaches their phase |
+
+V8 runs your code on one call stack, and nothing interrupts a function halfway. The language itself has no timers, no I/O and no event loop. All it has is a queue for promise jobs.
+
+Everything else comes from the host. In a browser that is the HTML event loop. In Node, the bottom row is libuv, which is where most of this post goes.
+
+## Microtasks: between every callback
+
+The middle two rows are the cheap ones. After each callback, Node empties the whole `nextTick` queue, then the microtask queue, and repeats until both are empty (`processTicksAndRejections()` in `lib/internal/process/task_queues.js`). Only then does control go back to the loop.
+
+"Callback" here means any time the loop calls into your JavaScript: the main script itself, one `setTimeout` function, one `fs.readFile` callback, one `setImmediate` function. Each one counts separately, even when two of them run in the same phase:
+
+```js
+setTimeout(() => {
+  console.log("timeout 1");
+  process.nextTick(() => console.log("  tick from timeout 1"));
+}, 0);
+setTimeout(() => {
+  console.log("timeout 2");
+  Promise.resolve().then(() => console.log("  promise from timeout 2"));
+}, 0);
+console.log("main script");
+process.nextTick(() => console.log("  tick from main"));
+```
+
+```
+main script
+  tick from main
+timeout 1
+  tick from timeout 1
+timeout 2
+  promise from timeout 2
+```
+
+The tick from `timeout 1` squeezes in before `timeout 2`, although both timers are due in the same pass. Node has done this since [v11.0.0](https://github.com/nodejs/node/pull/22842). Before that, the whole timers phase ran first and microtasks waited until the end.
+
+That explains rows two to four of the output: `sync` finishes, then ticks, then promises, and the loop has not even started.
+
+It also explains the classic footgun. A `nextTick` that schedules another `nextTick` never lets the loop move on. Timers and I/O starve.
+
+One gotcha: run the same six lines as an `.mjs` file and the middle changes.
+
+```
+sync
+promise
+queueMicrotask
+nextTick
+setTimeout
+setImmediate
+```
+
+Node evaluates an ES module asynchronously, so when the top level finishes, V8 empties its microtask queue before Node gets its turn at the tick queue. Same code, different owner order.
+
+## Macrotasks: libuv's while loop
+
+Now the bottom row. Try this:
+
+```bash
+node -p "process.versions.uv"
+```
+
+Mine says `1.52.1` on Node v24.22.1. That is libuv, compiled into Node from `deps/uv`. It hides the differences between `epoll` (Linux), `kqueue` (macOS, BSD), event ports (SunOS) and IOCP (Windows) behind one API, and decides when callbacks run.
+
+The deciding part is `uv_run()` in `src/unix/core.c`. Trimmed of metrics and comments:
+
+```c
+r = uv__loop_alive(loop);
+
+if (mode == UV_RUN_DEFAULT && r != 0 && loop->stop_flag == 0) {
+  uv__update_time(loop);
+  uv__run_timers(loop);
+}
+
+while (r != 0 && loop->stop_flag == 0) {
+  uv__run_pending(loop);
+  uv__run_idle(loop);
+  uv__run_prepare(loop);
+
+  timeout = 0;
+  if ((mode == UV_RUN_ONCE && can_sleep) || mode == UV_RUN_DEFAULT)
+    timeout = uv__backend_timeout(loop);
+
+  uv__io_poll(loop, timeout);
+
+  for (r = 0; r < 8 && !uv__queue_empty(&loop->pending_queue); r++)
+    uv__run_pending(loop);
+
+  uv__run_check(loop);
+  uv__run_closing_handles(loop);
+
+  uv__update_time(loop);
+  uv__run_timers(loop);
+
+  r = uv__loop_alive(loop);
+}
+```
+
+Drawn in call order, with Node's microtask strip underneath:
+
+<UvRunLoop />
+
+Find each API on it:
+
+- **I/O callbacks** run in 3 · Poll, the only step that sleeps.
+- **`setImmediate`** runs in 4 · Check, right after the poll.
+- **Close events** run in 5 · Close.
+- **`setTimeout` and `setInterval`** run in 6 · Timers, plus one extra pass before the loop starts. That pass exists, in the source comment's words, to "maintain backwards compatibility" since libuv 1.45.0 moved timers to the end.
+
+Node does not hand libuv one handle per call, though. It keeps a single `uv_timer_t` and a single check handle (`src/env.cc`), and holds your timers and immediates in JavaScript lists (`lib/internal/timers.js`). libuv supplies the clock and the phase. Node decides which of its own callbacks to run when that phase arrives.
+
+## setImmediate vs setTimeout(0)
+
+In the six-line script `setTimeout` came before `setImmediate`, 30 runs out of 30. Delete the other four lines and it flips to mostly `setImmediate`. The Node docs call the order non-deterministic from the main script. Inside an I/O callback, `setImmediate` always wins. Both answers come from loop position.
+
+**Inside an I/O callback**, you are standing in 3 · Poll. Press "inside an I/O callback" on the diagram. The next stop is 4 · Check. Timers are two steps further on.
+
+**From the main script**, the loop has not started. Two details decide it:
+
+- `setTimeout(fn, 0)` is really 1 ms. Node's `Timeout` constructor turns anything below 1 into 1.
+- `uv_run()` runs due timers once before the while loop.
+
+If a millisecond has passed by the time the loop starts, that pass fires the timeout first. If not, the loop moves on to Check. It does not sleep in Poll on the way, because while immediates are queued Node starts an idle handle, and an active idle handle makes `uv__backend_timeout()` return 0. Press "from the main script" to follow it.
+
+Measured on my machine with just the two calls:
+
+```
+plain script            39 immediate, 1 timeout   (40 runs)
+plus 2 ms busy-wait     20 timeout                (20 runs)
+```
+
+And the full picture inside an I/O callback, where nothing is left to chance:
+
+```js
+const fs = require("node:fs");
+
+fs.readFile(__filename, () => {
+  setTimeout(() => console.log("5 timeout"), 0);
+  setImmediate(() => console.log("4 immediate"));
+  Promise.resolve().then(() => console.log("3 promise"));
+  process.nextTick(() => console.log("2 nextTick"));
+  console.log("1 sync");
+});
+```
+
+```
+1 sync
+2 nextTick
+3 promise
+4 immediate
+5 timeout
+```
+
+## Why your program will not exit
+
+The gate on the left of the diagram is `uv__loop_alive()`:
+
+```c
+static int uv__loop_alive(const uv_loop_t* loop) {
+  return uv__has_active_handles(loop) ||
+         uv__has_active_reqs(loop) ||
+         !uv__queue_empty(&loop->pending_queue) ||
+         loop->closing_handles != NULL;
+}
+```
+
+A handle is a long-lived source like a socket or a timer. A request is one operation like a single write. While any is active, the loop goes round again. An open server or an uncleared `setInterval` is enough. A promise that never settles is not, because promises never reach libuv.
+
+## Where fs callbacks really come from
+
+Sockets are truly non-blocking. Files are not on every OS, so libuv runs `fs` calls (and `getaddrinfo`, which is why `dns.lookup()` uses it and `dns.resolve()` does not) on a thread pool. The default of four is an array, `static uv_thread_t default_threads[4];`, and `UV_THREADPOOL_SIZE` is parsed with `atoi()` and no error check, so `UV_THREADPOOL_SIZE=banana` quietly means one thread.
+
+When a worker finishes it calls `uv_async_send()` to wake the loop. Your callback then runs in 3 · Poll, on the loop thread, which is why it never needs a mutex.
+
+## So, is it all libuv?
+
+In Node, half of it. libuv owns the loop, the phases and the waiting: timers, I/O, `setImmediate`, close events. It knows nothing about `process.nextTick` (Node) or promises (V8), which run between libuv's callbacks.
+
+Outside Node there is no libuv at all. A browser follows the HTML event loop: one task, then all microtasks, then maybe a render. The microtask part works the same way, and the rest does not.
+
+The rule I keep now: plain code first, then microtasks after every callback, then wherever the loop happens to be standing.
+
+## Sources
+
+- [The Node.js event loop, timers and `process.nextTick()`](https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick)
+- [libuv design overview](https://docs.libuv.org/en/v1.x/design.html)
+- [libuv `src/unix/core.c`](https://github.com/libuv/libuv/blob/v1.x/src/unix/core.c)
+- [libuv thread pool](https://docs.libuv.org/en/v1.x/threadpool.html)
+- [Node `lib/internal/process/task_queues.js`](https://github.com/nodejs/node/blob/main/lib/internal/process/task_queues.js) (nextTick, then microtasks)
+- [Node `lib/internal/timers.js`](https://github.com/nodejs/node/blob/main/lib/internal/timers.js) (the 1 ms floor, the timer lists)
+- [Node `src/env.cc`](https://github.com/nodejs/node/blob/main/src/env.cc) (one timer handle, the idle handle for immediates)
+- [HTML spec: event loop processing model](https://html.spec.whatwg.org/multipage/webappapis.html#event-loop-processing-model)
+- [MDN: microtasks in JavaScript](https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide)
+- [Node.js DNS implementation considerations](https://nodejs.org/api/dns.html#implementation-considerations)

@@ -5,6 +5,9 @@ dist/
 
 .hallmark/
 
+# generated diagram artifacts
+.archify/
+
 # dependencies
 node_modules/
 
