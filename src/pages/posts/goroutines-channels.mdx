@@ -1,0 +1,137 @@
+---
+title: "Goroutines and channels, from the runtime's side"
+description: What go f() and ch <- v actually do inside the Go runtime
+slug: goroutines-channels
+tags:
+  - tech
+  - go
+createdAt: 2026-11-04
+layout: ../../layouts/BlogPost.astro
+---
+
+import GoChanSend from "../../components/diagrams/GoChanSend.astro";
+
+Goroutines and channels are the two things everyone learns first in Go, and the two things most people treat as magic. They are not. A goroutine is a small struct the scheduler moves between threads. A channel is a locked queue with two waiting lines. This post opens both, with one diagram doing most of the talking.
+
+## A goroutine is cheap on purpose
+
+```go
+go worker(id)
+```
+
+That line does not create a thread. It creates a **G**, a goroutine record with its own small stack, and puts it on a run queue. The runtime's scheduler comment in `runtime/proc.go` names the three pieces involved:
+
+- **G**: a goroutine.
+- **M**: an OS thread ("machine").
+- **P**: a processor, the right to run Go code. An M must hold a P to run a G.
+
+There are `GOMAXPROCS` Ps, by default one per logical CPU (12 on my M4 Pro). New goroutines start with a small stack, 2 KB unless the runtime has learned that your goroutines usually need more, and the stack grows as needed. That is why a hundred thousand goroutines is normal.
+
+The important part is what happens when a goroutine blocks. It does not take its thread down with it. The goroutine is **parked**, and the M picks up the next runnable G. Blocking costs a goroutine, not a thread.
+
+## A channel is a locked queue
+
+Here is the channel itself, `hchan` from `runtime/chan.go`, trimmed:
+
+```go
+type hchan struct {
+	qcount   uint           // values in the buffer
+	dataqsiz uint           // buffer capacity: make(chan T, n)
+	buf      unsafe.Pointer // ring buffer
+	sendx    uint           // next slot to write
+	recvx    uint           // next slot to read
+	recvq    waitq          // goroutines blocked receiving
+	sendq    waitq          // goroutines blocked sending
+	closed   uint32
+	lock     mutex
+}
+```
+
+A ring buffer, two indexes, two lines of waiting goroutines, and a lock. An unbuffered channel is the same struct with `dataqsiz` set to 0.
+
+## What `ch <- v` does
+
+Every send runs `chansend()`, and every outcome is in this diagram. Press the trace buttons to follow each case:
+
+<GoChanSend />
+
+Three things are worth noticing.
+
+**The buffer is the second choice.** If a receiver is already waiting, the sender copies the value straight onto the receiver's stack and never touches `buf`. The buffer only matters when nobody is ready yet.
+
+**The receiver runs next.** After the handoff, the sender puts the receiver into its P's `runnext` slot. The comment on that field in `runtime/runtime2.go` explains why: goroutines "locked in a communicate-and-wait pattern" get scheduled as a unit, instead of waiting at the back of the run queue. Ping-pong over a channel stays fast because of this.
+
+**Blocking is just the bottom lane.** No receiver and no room means the sender joins `sendq` and parks. Its thread is free immediately. Receiving is the mirror image: take from a waiting sender, else read the buffer, else park in `recvq`.
+
+## A worker pool, read through the diagram
+
+```go
+jobs := make(chan int, 3)
+results := make(chan string)
+
+for w := 1; w <= 2; w++ {
+	go func(id int) {
+		for j := range jobs {
+			time.Sleep(10 * time.Millisecond)
+			results <- fmt.Sprintf("worker %d did job %d", id, j)
+		}
+	}(w)
+}
+
+go func() {
+	for j := 1; j <= 4; j++ {
+		jobs <- j
+	}
+	close(jobs)
+}()
+
+for i := 0; i < 4; i++ {
+	fmt.Println(<-results)
+}
+```
+
+```
+worker 1 did job 2
+worker 2 did job 1
+worker 1 did job 3
+worker 2 did job 4
+```
+
+Each line maps to a lane:
+
+- `jobs <- j` takes **receiver waiting** while a worker is idle in `range jobs`, and **buffer has room** while both are busy. With 4 jobs and 3 slots, the producer never blocks.
+- `results <-` is unbuffered, so each worker takes **receiver waiting** if `main` is already blocked in `<-results`, and **G1 blocks** if it is not.
+- `close(jobs)` wakes any worker parked in `recvq`. Their `range` loops end once the buffer is drained.
+
+The job order changes between runs, because which worker the scheduler wakes first is not something channels promise.
+
+## When it goes wrong
+
+Every failure is one box in the diagram:
+
+```go
+ch := make(chan int)
+ch <- 1 // nobody will ever receive
+```
+
+```
+fatal error: all goroutines are asleep - deadlock!
+
+goroutine 1 [chan send]:
+```
+
+The send took the **G1 blocks** path, and no other goroutine exists to wake it. The runtime notices that every goroutine is parked and stops the program. Two more rules from `chan.go`:
+
+- A send on a closed channel panics with `send on closed channel`.
+- A send or receive on a `nil` channel parks forever.
+
+## Sources
+
+- [Go runtime `chan.go`](https://github.com/golang/go/blob/master/src/runtime/chan.go) (`hchan`, `chansend`, `chanrecv`)
+- [Go runtime `proc.go`](https://github.com/golang/go/blob/master/src/runtime/proc.go) (G, M, P overview)
+- [Go runtime `runtime2.go`](https://github.com/golang/go/blob/master/src/runtime/runtime2.go) (`runnext`)
+- [Go runtime `stack.go`](https://github.com/golang/go/blob/master/src/runtime/stack.go) (starting stack size)
+- [Scalable Go scheduler design doc](https://golang.org/s/go11sched)
+- [`runtime.GOMAXPROCS`](https://pkg.go.dev/runtime#GOMAXPROCS)
+- [The Go spec: channel types](https://go.dev/ref/spec#Channel_types)
+- [Effective Go: concurrency](https://go.dev/doc/effective_go#concurrency)

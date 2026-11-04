@@ -1,0 +1,380 @@
+---
+// What `ch <- v` does inside the Go runtime (runtime/chan.go, chansend),
+// in three lanes: the sending goroutine, the channel under its lock, and the
+// scheduler. Drafted with Archify, redrawn in the blog's tokens. Click a step
+// for details, or trace one of the four outcomes with the buttons.
+---
+
+<div class="go-chan" data-diagram>
+  <figure class="go-chan__figure">
+    <div class="go-chan__scroll">
+      <svg class="go-chan__svg" role="group" viewBox="0 0 1000 500" lang="en" aria-labelledby="go-chan-title go-chan-desc">
+        <title id="go-chan-title">What ch &lt;- v does inside the Go runtime</title>
+        <desc id="go-chan-desc">A send locks the channel and checks three things in order. If the channel is closed, it panics. If a receiver is already waiting, the value is copied straight to it and the receiver is made runnable next. Otherwise, if the buffer has room, the value is copied into the buffer. If not, the sender parks in the send queue, its thread runs another goroutine, and a later receiver takes the value and wakes it.</desc>
+        <defs>
+          <marker id="go-chan-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+        </defs>
+
+        <!-- Lanes -->
+        <rect x="20" y="16" width="960" height="140" class="c-lane" stroke-width="1" />
+        <text x="36" y="38" class="t-muted" font-size="10" font-weight="600">sending goroutine (G1)</text>
+        <rect x="20" y="176" width="960" height="140" class="c-lane" stroke-width="1" />
+        <text x="36" y="198" class="t-muted" font-size="10" font-weight="600">channel (hchan, under c.lock)</text>
+        <rect x="20" y="336" width="960" height="140" class="c-lane" stroke-width="1" />
+        <text x="36" y="358" class="t-muted" font-size="10" font-weight="600">scheduler (P runs G on M)</text>
+
+        <!-- Edges -->
+        <path data-edge-from="send" data-edge-to="closed" d="M 260 120 L 260 220" class="a-default" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="closed" data-edge-to="panic" d="M 196 250 L 164 250" class="a-default" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="closed" data-edge-to="waiter" d="M 324 250 L 356 250" class="a-default" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="waiter" data-edge-to="handoff" d="M 420 220 L 420 120" class="a-default" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="handoff" data-edge-to="cont" d="M 484 90 L 836 90" class="a-default" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="waiter" data-edge-to="room" d="M 484 250 L 516 250" class="a-default" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="room" data-edge-to="enqueue" d="M 644 250 L 676 250" class="a-default" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="enqueue" data-edge-to="cont" d="M 804 250 L 870 250 L 870 120" class="a-default" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="room" data-edge-to="park" d="M 580 280 L 580 380" class="a-default a-dashed" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="park" data-edge-to="wake" d="M 644 410 L 836 410" class="a-default a-dashed" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+        <path data-edge-from="wake" data-edge-to="cont" d="M 930 380 L 930 120" class="a-default a-dashed" stroke-width="1.4" marker-end="url(#go-chan-arrowhead)" />
+
+        <!-- Nodes -->
+        <g data-step="send" tabindex="0" role="button" aria-pressed="false" aria-label="ch <- v — chansend()" data-detail="The compiler turns a send into a call to runtime.chansend. It takes the channel's lock, so every check below sees a consistent channel.">
+          <rect x="196" y="60" width="128" height="60" class="c-mask" />
+          <rect x="196" y="60" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="260" y="85" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">ch &lt;- v</text>
+          <text x="260" y="101" class="t-muted" font-size="8.5" text-anchor="middle">chansend(), lock c</text>
+        </g>
+
+        <g data-step="handoff" tabindex="0" role="button" aria-pressed="false" aria-label="Hand v to G2 — sendDirect, goready" data-detail="A receiver is already blocked in <-ch. G1 copies v straight onto that receiver's stack, skipping the buffer, and marks it runnable in its P's runnext slot, so the receiver runs next on this P.">
+          <rect x="356" y="60" width="128" height="60" class="c-mask" />
+          <rect x="356" y="60" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="420" y="80" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">hand v to G2</text>
+          <text x="420" y="95" class="t-muted" font-size="8.5" text-anchor="middle">sendDirect, skips buf</text>
+          <text x="420" y="109" class="t-accent" font-size="8" text-anchor="middle">G2 → runnext</text>
+        </g>
+
+        <g data-step="cont" tabindex="0" role="button" aria-pressed="false" aria-label="G1 continues — the send returns" data-detail="The send is done and G1 carries on with its next statement. On the park path, this happens only after a receiver has woken it.">
+          <rect x="836" y="60" width="128" height="60" class="c-mask" />
+          <rect x="836" y="60" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="900" y="85" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">G1 continues</text>
+          <text x="900" y="101" class="t-muted" font-size="8.5" text-anchor="middle">send returns</text>
+        </g>
+
+        <g data-step="panic" tabindex="0" role="button" aria-pressed="false" aria-label="panic — send on closed channel" data-detail="Sending on a closed channel always panics. Receiving from one never blocks: once its buffer is drained, it returns the zero value and ok == false.">
+          <rect x="36" y="220" width="128" height="60" class="c-mask" />
+          <rect x="36" y="220" width="128" height="60" class="c-node c-alert" stroke-width="1.5" />
+          <text x="100" y="245" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">panic</text>
+          <text x="100" y="261" class="t-muted" font-size="8.5" text-anchor="middle">send on closed channel</text>
+        </g>
+
+        <g data-step="closed" tabindex="0" role="button" aria-pressed="false" aria-label="Closed? — c.closed != 0" data-detail="The first check, under the lock. A closed channel cannot take new values.">
+          <rect x="196" y="220" width="128" height="60" class="c-mask" />
+          <rect x="196" y="220" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="260" y="245" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">closed?</text>
+          <text x="260" y="261" class="t-muted" font-size="8.5" text-anchor="middle">c.closed != 0</text>
+        </g>
+
+        <g data-step="waiter" tabindex="0" role="button" aria-pressed="false" aria-label="Receiver waiting? — c.recvq.dequeue()" data-detail="recvq is the line of goroutines blocked in <-ch. If anyone is in it, the send never touches the buffer.">
+          <rect x="356" y="220" width="128" height="60" class="c-mask" />
+          <rect x="356" y="220" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="420" y="245" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">receiver waiting?</text>
+          <text x="420" y="261" class="t-muted" font-size="8.5" text-anchor="middle">c.recvq.dequeue()</text>
+        </g>
+
+        <g data-step="room" tabindex="0" role="button" aria-pressed="false" aria-label="Buffer has room? — qcount < dataqsiz" data-detail="dataqsiz is the capacity from make(chan T, n). For an unbuffered channel it is 0, so this check always fails.">
+          <rect x="516" y="220" width="128" height="60" class="c-mask" />
+          <rect x="516" y="220" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="580" y="245" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">buffer has room?</text>
+          <text x="580" y="261" class="t-muted" font-size="8.5" text-anchor="middle">qcount &lt; dataqsiz</text>
+        </g>
+
+        <g data-step="enqueue" tabindex="0" role="button" aria-pressed="false" aria-label="Copy into buf — buf[sendx], qcount++" data-detail="buf is a ring buffer. v is copied into slot sendx, sendx moves on and wraps around, and qcount goes up by one.">
+          <rect x="676" y="220" width="128" height="60" class="c-mask" />
+          <rect x="676" y="220" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="740" y="245" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">copy into buf</text>
+          <text x="740" y="261" class="t-muted" font-size="8.5" text-anchor="middle">buf[sendx], qcount++</text>
+        </g>
+
+        <g data-step="park" tabindex="0" role="button" aria-pressed="false" aria-label="Park G1 in sendq — gopark" data-detail="G1 joins sendq and calls gopark. The goroutine stops, but its OS thread does not: the M goes straight back to the scheduler and runs another goroutine.">
+          <rect x="516" y="380" width="128" height="60" class="c-mask" />
+          <rect x="516" y="380" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="580" y="405" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">park G1 in sendq</text>
+          <text x="580" y="421" class="t-muted" font-size="8.5" text-anchor="middle">gopark: M runs next G</text>
+        </g>
+
+        <g data-step="wake" tabindex="0" role="button" aria-pressed="false" aria-label="A receiver takes v — goready(G1)" data-detail="Later, a receiver finds G1 in sendq, takes its value and calls goready. G1 is runnable again and will resume when a P picks it up.">
+          <rect x="836" y="380" width="128" height="60" class="c-mask" />
+          <rect x="836" y="380" width="128" height="60" class="c-node" stroke-width="1.5" />
+          <text x="900" y="405" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">a receiver takes v</text>
+          <text x="900" y="421" class="t-muted" font-size="8.5" text-anchor="middle">goready(G1)</text>
+        </g>
+
+        <!-- Edge labels -->
+        <g data-edge-from="closed" data-edge-to="panic">
+          <rect x="169" y="243" width="22" height="14" class="c-mask" />
+          <text x="180" y="253" class="t-muted" font-size="8" text-anchor="middle">yes</text>
+        </g>
+        <g data-edge-from="closed" data-edge-to="waiter">
+          <rect x="331" y="243" width="18" height="14" class="c-mask" />
+          <text x="340" y="253" class="t-muted" font-size="8" text-anchor="middle">no</text>
+        </g>
+        <g data-edge-from="waiter" data-edge-to="handoff">
+          <rect x="409" y="163" width="22" height="14" class="c-mask" />
+          <text x="420" y="173" class="t-muted" font-size="8" text-anchor="middle">yes</text>
+        </g>
+        <g data-edge-from="handoff" data-edge-to="cont">
+          <rect x="645" y="83" width="30" height="14" class="c-mask" />
+          <text x="660" y="93" class="t-muted" font-size="8" text-anchor="middle">done</text>
+        </g>
+        <g data-edge-from="waiter" data-edge-to="room">
+          <rect x="491" y="243" width="18" height="14" class="c-mask" />
+          <text x="500" y="253" class="t-muted" font-size="8" text-anchor="middle">no</text>
+        </g>
+        <g data-edge-from="room" data-edge-to="enqueue">
+          <rect x="649" y="243" width="22" height="14" class="c-mask" />
+          <text x="660" y="253" class="t-muted" font-size="8" text-anchor="middle">yes</text>
+        </g>
+        <g data-edge-from="room" data-edge-to="park">
+          <rect x="571" y="323" width="18" height="14" class="c-mask" />
+          <text x="580" y="333" class="t-muted" font-size="8" text-anchor="middle">no</text>
+        </g>
+        <g data-edge-from="park" data-edge-to="wake">
+          <rect x="722" y="403" width="36" height="14" class="c-mask" />
+          <text x="740" y="413" class="t-muted" font-size="8" text-anchor="middle">later</text>
+        </g>
+        <g data-edge-from="wake" data-edge-to="cont">
+          <rect x="904" y="323" width="52" height="14" class="c-mask" />
+          <text x="930" y="333" class="t-muted" font-size="8" text-anchor="middle">G1 wakes</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>
+      One send, four possible outcomes; only the bottom lane blocks. Click a step for details, or trace a case below.
+    </figcaption>
+  </figure>
+  <div class="go-chan__traces" role="group" aria-label="Trace a case">
+    <span>Trace:</span>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-diagram-trace="handoff"
+      data-steps="send closed waiter handoff cont"
+      data-title="A receiver is already waiting"
+      data-detail="The value goes straight from G1 to G2, with no buffer in between, and G2 runs next. This is the path an unbuffered channel takes when the receiver got there first."
+    >receiver waiting</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-diagram-trace="buffer"
+      data-steps="send closed waiter room enqueue cont"
+      data-title="Buffered, with room left"
+      data-detail="Nobody is waiting, but the buffer has space. v lands in the ring buffer and G1 keeps going without blocking."
+    >buffer has room</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-diagram-trace="park"
+      data-steps="send closed waiter room park wake cont"
+      data-title="No receiver, no room: G1 blocks"
+      data-detail="Always the case for an unbuffered channel with nobody waiting, or a full buffer. G1 parks, its thread runs other goroutines, and a later receiver hands control back."
+    >G1 blocks</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-diagram-trace="closed"
+      data-steps="send closed panic"
+      data-title="Send on a closed channel"
+      data-detail="The very first check fails, and the program panics."
+    >closed</button>
+  </div>
+  <div class="go-chan__panel" aria-live="polite" data-diagram-panel>
+    <p class="go-chan__panel-title" data-diagram-title></p>
+    <p class="go-chan__panel-text" data-diagram-desc></p>
+  </div>
+</div>
+
+<style>
+  /* Same frame as the libuv diagram: wide enough to keep labels at reading
+     size, scrolling below that instead of shrinking them. */
+  .go-chan {
+    --go-chan-frame: min(100vw - 2rem, 68rem);
+
+    width: var(--go-chan-frame);
+    margin-inline: calc((100% - var(--go-chan-frame)) / 2);
+    margin-block: var(--space-lg);
+    padding-block: var(--space-sm) var(--space-xs);
+    border-block: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .go-chan__figure {
+    margin: 0;
+  }
+
+  .go-chan__scroll {
+    overflow-x: auto;
+  }
+
+  .go-chan__svg {
+    display: block;
+    width: 100%;
+    min-width: 46rem;
+    height: auto;
+    font-family: var(--font-outlier);
+  }
+
+  /* Palette: paper, ink, rule, and the single burnt-orange accent. */
+  .c-lane {
+    fill: none;
+    stroke: var(--color-rule);
+  }
+
+  .c-node {
+    fill: var(--color-paper-2);
+    stroke: var(--color-rule-2);
+  }
+
+  .c-alert {
+    stroke-dasharray: 4 3;
+  }
+
+  .c-mask {
+    fill: var(--color-paper);
+  }
+
+  .a-default {
+    fill: none;
+    stroke: var(--color-rule-2);
+  }
+
+  .a-dashed {
+    stroke-dasharray: 5 4;
+  }
+
+  .m-default {
+    fill: var(--color-rule-2);
+  }
+
+  .t-primary {
+    fill: var(--color-ink);
+  }
+
+  .t-muted {
+    fill: var(--color-muted);
+  }
+
+  .t-accent {
+    fill: var(--color-accent);
+  }
+
+  /* Exploration: the chosen step or trace and its relationships stay lit. */
+  [data-step] {
+    cursor: pointer;
+  }
+
+  [data-step]:focus {
+    outline: none;
+  }
+
+  [data-step]:focus-visible > rect:not(.c-mask) {
+    stroke: var(--color-accent);
+    stroke-width: 2;
+  }
+
+  .go-chan[data-focus] [data-step],
+  .go-chan[data-focus] [data-edge-from] {
+    opacity: 0.5;
+    transition: opacity var(--dur-micro) var(--ease-out);
+  }
+
+  .go-chan[data-focus] .is-on {
+    opacity: 1;
+  }
+
+  :global(:root.dark) .go-chan[data-focus] [data-step]:not(.is-on),
+  :global(:root.dark) .go-chan[data-focus] [data-edge-from]:not(.is-on) {
+    opacity: 0.35;
+  }
+
+  .go-chan[data-focus] [data-edge-from].is-on {
+    stroke-width: 2;
+  }
+
+  [data-step].is-on > rect:not(.c-mask) {
+    stroke: var(--color-accent);
+    stroke-width: 1.6;
+  }
+
+  .go-chan__traces {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-sm);
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+
+  .go-chan__traces button {
+    padding: 0.15rem 0.5rem;
+    border: var(--rule-hair) solid var(--color-rule-2);
+    background: none;
+    color: var(--color-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .go-chan__traces button[aria-pressed="true"] {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .go-chan__panel {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .go-chan__panel[data-active] {
+    margin-block-start: var(--space-md);
+    padding-block-start: var(--space-sm);
+    border-block-start: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .go-chan__panel-title {
+    margin: 0;
+    color: var(--color-ink);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .go-chan__panel-text {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--color-ink-2);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+  }
+
+  figcaption {
+    max-width: 68ch;
+    margin-block-start: var(--space-sm);
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.55;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .go-chan[data-focus] [data-step],
+    .go-chan[data-focus] [data-edge-from] {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import "./explorable";
+</script>
