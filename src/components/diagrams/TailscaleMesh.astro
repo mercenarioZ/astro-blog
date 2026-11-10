@@ -1,0 +1,327 @@
+---
+// A small tailnet in 3D: three devices behind three NATs, the coordination
+// server (control plane) above them and a DERP relay between them. Drag to
+// orbit; the step buttons walk through how a connection comes up.
+---
+
+<div class="ts-mesh" data-ts-mesh>
+  <figure class="ts-mesh__figure">
+    <div
+      class="ts-mesh__stage"
+      data-ts-stage
+      role="img"
+      aria-label="3D model of a tailnet. A laptop, a server and a phone each sit inside their own private network behind a NAT. A coordination server floats above them, linked to each device by a dashed control line. A DERP relay stands in the middle, linked to each device. Curved tunnels join the devices to each other directly."
+    >
+      <p class="ts-mesh__fallback" data-ts-fallback>Loading the 3D model…</p>
+    </div>
+    <figcaption>Drag to rotate, then walk through the steps. The labels on the moving dots say what is being sent.</figcaption>
+  </figure>
+  <div class="ts-mesh__steps" role="group" aria-label="Steps">
+    <span>Step:</span>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-ts-step="keys"
+      data-plane="control"
+      data-title="1. Each device publishes a public key"
+      data-detail="You log in through your identity provider. The device makes its own WireGuard key pair and sends only the public half up to the coordination server. The public key is the device's identity: others use it to encrypt packets that only this device, holding the private key, can open."
+    >1 keys up</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-ts-step="peers"
+      data-plane="control"
+      data-title="2. The peer map comes down"
+      data-detail="The coordination server sends every device the public keys and addresses of its peers, plus the access rules. That is all the control plane does, so it carries almost no traffic."
+    >2 peer map down</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-ts-step="relay"
+      data-plane="relay"
+      data-title="3. First packets go through a relay"
+      data-detail="Every connection starts through a DERP relay, because outbound HTTPS works from almost any network. The packets are already WireGuard-encrypted, so the relay forwards them without being able to read them."
+    >3 relay</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-ts-step="direct"
+      data-plane="direct"
+      data-title="4. Then the tunnel goes direct"
+      data-detail="Meanwhile both devices learn their public address with STUN and send to each other at the same moment, which opens a path through both NATs. Traffic moves to a direct WireGuard tunnel, device to device."
+    >4 direct</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-ts-step="all"
+      data-title="The whole picture"
+      data-detail="Blue is the control plane: it only ever carries keys and rules. Orange is the relay, the fallback path for data. Green is the direct tunnel, where your data normally travels."
+    >whole picture</button>
+  </div>
+  <div class="ts-mesh__panel" aria-live="polite">
+    <p class="ts-mesh__panel-title" data-ts-title></p>
+    <p class="ts-mesh__panel-text" data-ts-desc></p>
+  </div>
+  <dl class="ts-mesh__key">
+    <div>
+      <dt><span class="ts-mesh__swatch" data-plane="direct"></span>Green boxes: your devices</dt>
+      <dd><b>Yours.</b> Each one keeps its own private key and gets a fixed 100.x address.</dd>
+    </div>
+    <div>
+      <dt><span class="ts-mesh__swatch ts-mesh__swatch--wall"></span>Dashed box: a NAT</dt>
+      <dd><b>Your router or phone carrier.</b> Nothing outside can start a connection into the network behind it.</dd>
+    </div>
+    <div>
+      <dt><span class="ts-mesh__swatch" data-plane="control"></span>Blue: the control plane</dt>
+      <dd><b>Run by Tailscale.</b> The coordination server and its dashed lines. They carry public keys and access rules, never your data.</dd>
+    </div>
+    <div>
+      <dt><span class="ts-mesh__swatch" data-plane="relay"></span>Orange: the relay</dt>
+      <dd><b>Run by Tailscale, in 28 cities.</b> Your device picks the fastest one. It passes on encrypted packets it cannot read.</dd>
+    </div>
+    <div>
+      <dt><span class="ts-mesh__swatch ts-mesh__swatch--line" data-plane="direct"></span>Green lines: direct tunnels</dt>
+      <dd><b>Nobody's server.</b> WireGuard across the ordinary internet, from one of your devices to another. Your data normally travels here.</dd>
+    </div>
+  </dl>
+</div>
+
+<style>
+  /* Same frame as the other diagrams. */
+  .ts-mesh {
+    --ts-mesh-frame: min(100vw - 2rem, 68rem);
+
+    width: var(--ts-mesh-frame);
+    margin-inline: calc((100% - var(--ts-mesh-frame)) / 2);
+    margin-block: var(--space-lg);
+    padding-block: var(--space-sm) var(--space-xs);
+    border-block: var(--rule-hair) solid var(--color-rule);
+
+    /* One colour per plane; the soft versions fill the shapes. */
+    --ts-control: oklch(50% 0.15 255);
+    --ts-relay: oklch(56% 0.16 55);
+    --ts-direct: oklch(50% 0.13 155);
+    --ts-control-soft: oklch(86% 0.06 255);
+    --ts-relay-soft: oklch(87% 0.08 65);
+    --ts-direct-soft: oklch(87% 0.07 155);
+  }
+
+  :global(:root.dark) .ts-mesh {
+    --ts-control: oklch(74% 0.13 250);
+    --ts-relay: oklch(76% 0.15 62);
+    --ts-direct: oklch(76% 0.15 155);
+    --ts-control-soft: oklch(36% 0.08 255);
+    --ts-relay-soft: oklch(38% 0.08 60);
+    --ts-direct-soft: oklch(36% 0.07 155);
+  }
+
+  .ts-mesh [data-plane="control"],
+  .ts-mesh :global([data-plane="control"]) {
+    --plane: var(--ts-control);
+    --plane-soft: var(--ts-control-soft);
+  }
+
+  .ts-mesh [data-plane="relay"],
+  .ts-mesh :global([data-plane="relay"]) {
+    --plane: var(--ts-relay);
+    --plane-soft: var(--ts-relay-soft);
+  }
+
+  .ts-mesh [data-plane="direct"],
+  .ts-mesh :global([data-plane="direct"]) {
+    --plane: var(--ts-direct);
+    --plane-soft: var(--ts-direct-soft);
+  }
+
+  .ts-mesh__figure {
+    margin: 0;
+  }
+
+  .ts-mesh__stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    cursor: grab;
+  }
+
+  .ts-mesh__stage:active {
+    cursor: grabbing;
+  }
+
+  .ts-mesh__stage :global(canvas),
+  .ts-mesh__stage :global(.ts-mesh__labels) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ts-mesh__stage :global(.ts-mesh__labels) {
+    pointer-events: none;
+  }
+
+  .ts-mesh__stage :global(.ts-mesh__label) {
+    display: grid;
+    padding: 0.1rem 0.35rem;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-outlier);
+    font-size: 0.6875rem;
+    line-height: 1.35;
+    text-align: center;
+    white-space: nowrap;
+    border-block-end: 2px solid var(--plane, transparent);
+  }
+
+  /* Rides along with a packet and names what it carries. */
+  .ts-mesh__stage :global(.ts-mesh__tag) {
+    padding: 0 0.3rem;
+    border: var(--rule-hair) solid var(--plane);
+    background: var(--color-paper);
+    color: var(--plane);
+    font-family: var(--font-outlier);
+    font-size: 0.625rem;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  .ts-mesh__stage :global(.ts-mesh__label small) {
+    color: var(--color-muted);
+    font-size: inherit;
+  }
+
+  .ts-mesh__fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+
+  .ts-mesh__steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-sm);
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+
+  .ts-mesh__steps button {
+    padding: 0.15rem 0.5rem;
+    border: var(--rule-hair) solid var(--color-rule-2);
+    background: none;
+    color: var(--color-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .ts-mesh__steps button[aria-pressed="true"] {
+    border-color: var(--plane, var(--color-ink));
+    background: var(--plane-soft, var(--color-paper-3));
+  }
+
+  .ts-mesh__key {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+    gap: var(--space-sm) var(--space-md);
+    margin-block: var(--space-sm) 0;
+    padding-block-start: var(--space-sm);
+    border-block-start: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .ts-mesh__key dt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-ink);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+
+  .ts-mesh__key dd {
+    margin: 0.2rem 0 0;
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .ts-mesh__key b {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .ts-mesh__swatch {
+    flex: none;
+    width: 0.8rem;
+    height: 0.8rem;
+    border: var(--rule-hair) solid var(--plane);
+    background: var(--plane-soft);
+  }
+
+  .ts-mesh__swatch--wall {
+    border: var(--rule-hair) dashed var(--color-muted);
+    background: none;
+  }
+
+  .ts-mesh__swatch--line {
+    height: 0;
+    border-width: 2px 0 0;
+  }
+
+  .ts-mesh__panel {
+    display: grid;
+    gap: 0.35rem;
+    /* Room for the longest step, so the page does not jump between steps. */
+    min-height: 8.5rem;
+    margin-block-start: var(--space-sm);
+    padding-block-start: var(--space-sm);
+    border-block-start: var(--rule-hair) solid var(--color-rule);
+    align-content: start;
+  }
+
+  .ts-mesh__panel-title {
+    margin: 0;
+    color: var(--color-ink);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .ts-mesh__panel-text {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--color-ink-2);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+  }
+
+  figcaption {
+    max-width: 68ch;
+    margin-block-start: var(--space-sm);
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 40rem) {
+    .ts-mesh__stage {
+      aspect-ratio: 1;
+    }
+
+    .ts-mesh__stage :global(.ts-mesh__label small) {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import "./tailscale-mesh";
+</script>

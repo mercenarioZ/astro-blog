@@ -1,0 +1,117 @@
+---
+title: "How Tailscale works, in 3D"
+description: Keys go up, a peer map comes down, and packets go straight across
+slug: tailscale
+tags:
+  - tech
+  - networking
+createdAt: 2026-11-10
+layout: ../../layouts/BlogPost.astro
+---
+
+import TailscaleMesh from "../../components/diagrams/TailscaleMesh.astro";
+
+Tailscale makes devices on different private networks behave like they share one LAN. It does this by splitting the work in two: a central server that only hands out keys, and WireGuard tunnels that carry the data device to device. Here is the whole thing as one model, with a key underneath for every part.
+
+<TailscaleMesh />
+
+## Two planes
+
+- **Control plane: hub and spoke.** Every device talks to the coordination server, which Tailscale's own post calls "a shared drop box for public keys". It carries almost no traffic.
+- **Data plane: mesh.** Every device talks to every other device over WireGuard. Your packets never pass through the coordination server.
+
+Each device also gets a stable address from `100.64.0.0/10`, the carrier-grade NAT range, so it is reachable at the same IP wherever it is.
+
+## What the public key is for
+
+Each device has a key pair. The **private key** stays on the device. The **public key** is safe to share, and it does two jobs:
+
+- **Identity.** In WireGuard a peer *is* its public key. "Allow the laptop" really means "allow this key".
+- **Encryption.** A packet encrypted for a public key can only be opened with the matching private key.
+
+So the coordination server can pass public keys around all day and still read nothing.
+
+## Who runs what
+
+- **Your devices and routers** are yours. So are the private keys.
+- **The coordination server** is run by Tailscale. Your devices reach it over the internet.
+- **DERP relays** are run by Tailscale in 28 cities, from Sydney to São Paulo. Each device measures latency and uses the nearest one.
+- **Login** is neither. Tailscale hands it to an identity provider you already use, such as Google, GitHub or Microsoft.
+
+Both Tailscale-run parts can be replaced. You can run your own relay with `derper`, and [Headscale](https://github.com/juanfont/headscale) is an open-source coordination server.
+
+## Getting through NAT
+
+None of the three devices has a public IP, and nobody opened a port. This is the hard part of Tailscale, and it is solved in layers.
+
+### The rule every NAT follows
+
+A NAT router lets a packet in only if it looks like a reply. In the words of Tailscale's own write-up, "packets must flow out before packets can flow back in". Each time a device sends something out, the router writes down a temporary mapping:
+
+```
+laptop 192.168.1.5:41641  ⇄  public 203.0.113.7:52001  →  peer X
+```
+
+A packet from X to `203.0.113.7:52001` is let through. A packet from anyone else is dropped. Both devices sit behind a rule like this, so neither can go first.
+
+### Layer 1: a relay that always works
+
+Each device opens an outbound connection to a DERP relay, which every NAT allows. The two devices can talk through it straight away. It is slow, but it never fails, and it doubles as the side channel for the next layer.
+
+### Layer 2: punching a hole
+
+While traffic flows through the relay, the devices try for a direct path:
+
+1. **Each asks a STUN server what it looks like from outside.** The answer is its public `ip:port`, the right-hand side of the mapping above.
+2. **They swap those addresses** through the side channel.
+3. **Both send to each other at roughly the same time.**
+4. **Each router has just seen its own device send to that address,** so the packet coming the other way looks like a reply and gets in.
+
+```
+laptop ──► [home router: expecting B]    ◄── packet from B: allowed
+server ──► [office router: expecting A]  ◄── packet from A: allowed
+```
+
+Routers forget idle mappings, often after about 30 seconds for UDP, so the devices keep pinging each other to hold the path open.
+
+### Layer 3: hard NATs
+
+Some NATs pick a different public port for every destination. The port the STUN server saw is then useless to the peer, and step 3 misses. These are the "hard" NATs, common on corporate and mobile networks. Tailscale has two more tricks:
+
+- **Ask the router for a port.** UPnP, NAT-PMP and PCP let a device request a public port directly, when the router supports them.
+- **Guess the port.** If only one side is hard, it opens about 256 ports while the easy side probes ports at random. With 1,024 probes there is a 98% chance one of them lands.
+
+With a hard NAT on both sides, guessing stops being practical, and the connection stays on the relay.
+
+| Situation | Result |
+|---|---|
+| Same LAN | Direct over the LAN, no internet involved |
+| Two easy NATs | Hole punched, direct |
+| One hard NAT | Usually direct, by port mapping or guessing |
+| Two hard NATs, or UDP blocked | Stays on the relay |
+
+## What Tailscale can't see
+
+- **Private keys** never leave the device, so the coordination server cannot decrypt anything.
+- **DERP relays** forward packets that are already encrypted. They know who is talking to whom, not what is said.
+- **Access rules** are stored centrally but enforced on each device, when it decrypts incoming packets.
+
+## See it on your own tailnet
+
+`tailscale ping` shows the path each reply took:
+
+```sh
+tailscale ping server
+```
+
+A reply `via DERP(...)` came through a relay, step 3 in the model. A reply via an `ip:port` is a direct tunnel, step 4. Usually the first reply or two are relayed and the rest are direct.
+
+## Sources
+
+- [How Tailscale works](https://tailscale.com/blog/how-tailscale-works)
+- [How NAT traversal works](https://tailscale.com/blog/how-nat-traversal-works)
+- [Control and data planes](https://tailscale.com/kb/1508/control-data-planes)
+- [Connection types](https://tailscale.com/kb/1257/connection-types)
+- [DERP servers](https://tailscale.com/kb/1232/derp-servers)
+- [Tailscale IP addresses](https://tailscale.com/kb/1015/100.x-addresses)
+- [WireGuard](https://www.wireguard.com/)
