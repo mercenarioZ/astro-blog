@@ -1,0 +1,123 @@
+---
+title: "Docker on a Mac is a Linux VM, in 3D"
+description: Containers share the host's kernel, and a Mac has no Linux kernel to share
+slug: docker-mac-vm
+tags:
+  - tech
+  - docker
+createdAt: 2026-11-13
+layout: ../../layouts/BlogPost.astro
+---
+
+import DockerMacStack from "../../components/diagrams/DockerMacStack.astro";
+
+Someone pointed out that a surprising number of people don't know Docker on macOS is actually a VM. Mitchell Hashimoto, who built Vagrant, answered that this is "a good filter for people who I don't want to work with", because "any software person should know how the layers work at a high level".
+
+He is right that you don't need to know Docker to get this. You need one fact about containers and one fact about macOS. First, here is where things actually travel when you use Docker on a Mac. Pick a flow and follow the numbers.
+
+<DockerMacStack />
+
+## Fact one: a container is a process
+
+A container is not a small computer. It is an ordinary process, and the Linux kernel runs it with two extra features turned on:
+
+- **Namespaces** limit what it can see: its own process list, its own network, its own filesystem tree.
+- **cgroups** limit what it can use: CPU, memory, I/O.
+
+Every container on a machine shares that machine's one kernel. An image like `ubuntu` or `alpine` holds files, libraries and binaries, but never a kernel. On a Linux machine you can check this. The host and the container report the same kernel:
+
+```sh
+uname -r
+docker run --rm alpine uname -r
+```
+
+## Fact two: macOS is not Linux
+
+macOS runs the XNU kernel. It has no Linux system calls, no namespaces and no cgroups. A Linux binary from a container image has nothing to run on.
+
+Put the two facts together and the answer follows: to run Linux containers on a Mac, something has to bring a Linux kernel. Docker Desktop does it by booting a Linux VM on Apple's Virtualization framework and running every container inside it.
+
+## What the VM explains
+
+Once you know the VM is there, a lot of Docker-on-Mac behaviour stops being strange:
+
+| What you notice | Why |
+|---|---|
+| Bind mounts are slow with many small files | Each file operation crosses from the VM to macOS and back, over VirtioFS |
+| `Mounts denied` for some folders | Only `/Users`, `/Volumes`, `/private`, `/tmp` and `/var/folders` are shared by default |
+| A container can't use all your RAM | It gets the memory you gave the VM in Settings, not the Mac's |
+| `--network host` doesn't expose ports on the Mac | The "host" is the VM |
+| The Mac is `host.docker.internal`, not `localhost` | Inside the container, `localhost` is the container itself |
+| File name case behaves differently | macOS filesystems are case-insensitive by default; Linux is not |
+| `amd64` images run slower on Apple silicon | The VM is `arm64`; `amd64` code runs under Rosetta emulation |
+
+## See the VM yourself
+
+Ask a container which kernel it is on:
+
+```sh
+uname -s                          # Darwin, your Mac
+docker run --rm alpine uname -sr  # Linux, the VM
+```
+
+You can also get a shell inside the VM. A privileged container that shares the VM's process list can join the namespaces of its PID 1:
+
+```sh
+docker run -it --rm --privileged --pid=host alpine nsenter -t 1 -m -u -n -i sh
+```
+
+You are now in the Linux VM, outside every container. `ps` there lists `dockerd` and every container's processes.
+
+## Linux VMs on macOS
+
+Docker Desktop is one of several tools that run a Linux VM on a Mac. Almost all of them now use Apple's Virtualization framework underneath, often called `vz`. They differ mainly in how many VMs they run and what they put in them.
+
+### One shared VM for all containers
+
+This is Docker Desktop's model, and most tools follow it.
+
+- **Docker Desktop.** One VM for every container, on the Virtualization framework by default. Docker VMM, Docker's own VM manager, is the alternative; HyperKit is deprecated.
+- **OrbStack.** One lightweight VM with a shared kernel. It runs Docker containers and full Linux "machines" with systemd, and its docs compare the design to WSL 2. Because everything shares one kernel, they advise against using it for malware analysis.
+- **Colima.** The name stands for "Containers on Lima". It is a small CLI that starts a Lima VM and runs Docker or containerd in it, with `--vm-type=vz` or `qemu`.
+- **Rancher Desktop.** Also built on Lima. It uses VZ by default and can switch to QEMU.
+- **Podman machine.** Podman's own VM. Since Podman 5.0 the default macOS provider is vfkit, a thin wrapper around the Virtualization framework. libkrun is an alternative provider.
+
+### Lima, the general one
+
+[Lima](https://lima-vm.io) runs Linux VMs for anything, not only containers, and both Colima and Rancher Desktop are built on it. Since v1.0 it uses `vz` by default on macOS 13.5 and later, and QEMU otherwise. The VM type is chosen when the instance is created and can't be changed after.
+
+```sh
+limactl start template://default
+lima uname -a
+```
+
+### One VM per container
+
+Apple's own [`container`](https://github.com/apple/container) tool, announced at WWDC 2025, does it the other way round. Built on its Swift [Containerization](https://github.com/apple/containerization) framework, it starts a separate lightweight VM for every container.
+
+| | One shared VM | One VM per container |
+|---|---|---|
+| Kernel | Shared by all containers | One per container |
+| Isolation | Linux namespaces, like on a Linux server | A hypervisor boundary per container |
+| Overhead | One VM, booted once | A small VM per container, kept fast to boot |
+| Examples | Docker Desktop, OrbStack, Colima, Podman | Apple `container` |
+
+Neither is wrong. A shared VM behaves most like the Linux server your containers will run on in production. A VM per container gives each one stronger isolation, the way a cloud provider would.
+
+## The point
+
+Mitchell's test is not about Docker trivia. It asks whether you keep a picture of the layers in your head: app, kernel, hardware. With that picture, the question "where does the Linux kernel come from on a Mac?" answers itself, and so do most of the odd things Docker does there.
+
+## Sources
+
+- [Docker Desktop for Mac FAQs](https://docs.docker.com/desktop/troubleshoot-and-support/faqs/macfaqs/)
+- [Docker Desktop: Virtual Machine Manager](https://docs.docker.com/desktop/features/vmm/)
+- [Docker Desktop settings on Mac](https://docs.docker.com/desktop/settings/mac/)
+- [Networking on Docker Desktop](https://docs.docker.com/desktop/features/networking/)
+- [Synchronized file shares](https://docs.docker.com/desktop/features/synchronized-file-sharing/)
+- [Getting a shell in the Docker Desktop VM](https://www.bretfisher.com/blog/docker-for-mac-commands-for-getting-into-local-docker-vm), Bret Fisher
+- [OrbStack architecture](https://docs.orbstack.dev/architecture)
+- [Lima: VM types](https://lima-vm.io/docs/config/vmtype/)
+- [Rancher Desktop: emulation on macOS](https://docs.rancherdesktop.io/ui/preferences/virtual-machine/emulation/)
+- [Podman and libkrun](https://blog.podman.io/2024/07/podman-and-libkrun/)
+- [apple/containerization](https://github.com/apple/containerization)

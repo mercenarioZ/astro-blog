@@ -1,0 +1,347 @@
+---
+// Docker on a Mac as a flow board: macOS on the left, the Linux VM on the
+// right, joined by the hypervisor. Each button plays one flow, hop by hop.
+---
+
+<div class="dk-stack" data-dk-stack>
+  <figure class="dk-stack__figure">
+    <div
+      class="dk-stack__stage"
+      data-dk-stage
+      role="img"
+      aria-label="3D flow board in two zones. On the left, macOS: a terminal, a browser and your ~/code folder, Docker Desktop in the middle and the macOS kernel along the front. On the right, inside a dashed wall, the Linux VM: dockerd, containerd and runc at the back, the nginx container in the middle and the VM's Linux kernel along the front. A hypervisor joins the two kernels."
+    >
+      <p class="dk-stack__fallback" data-dk-fallback>Loading the 3D model…</p>
+    </div>
+    <figcaption>Pick a flow. The numbers show the order, the moving dot says what is being sent, and the list below follows it hop by hop.</figcaption>
+  </figure>
+  <div class="dk-stack__steps" role="group" aria-label="Flows">
+    <span>Flow:</span>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-dk-step="run"
+      data-plane="mac"
+      data-title="docker run -p 8080:80 -v ~/code:/usr/share/nginx/html nginx"
+      data-detail="You type one command on the Mac. The container ends up on the other side of the VM's wall."
+    >docker run</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-dk-step="syscall"
+      data-plane="linux"
+      data-title="A system call"
+      data-detail="Inside the container, nginx only ever talks to a Linux kernel. Real hardware is one more hop away."
+    >syscall</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-dk-step="files"
+      data-plane="vm"
+      data-title="Reading a bind-mounted file"
+      data-detail="The file looks local to nginx, but it lives on the Mac. This trip is why bind mounts with many small files are slow."
+    >bind mount</button>
+    <button
+      type="button"
+      aria-pressed="false"
+      data-dk-step="ports"
+      data-plane="mac"
+      data-title="Opening localhost:8080"
+      data-detail="localhost on the Mac is not the container's localhost. Docker Desktop carries the connection across."
+    >port</button>
+  </div>
+  <div class="dk-stack__panel" aria-live="polite">
+    <p class="dk-stack__panel-title" data-dk-title></p>
+    <p class="dk-stack__panel-text" data-dk-desc></p>
+    <ol class="dk-stack__hops" data-dk-hops></ol>
+  </div>
+  <dl class="dk-stack__key">
+    <div>
+      <dt><span class="dk-stack__swatch" data-plane="mac"></span>Blue: macOS</dt>
+      <dd><b>The XNU kernel and Mac programs,</b> including the docker CLI and Docker Desktop itself.</dd>
+    </div>
+    <div>
+      <dt><span class="dk-stack__swatch dk-stack__swatch--wall" data-plane="vm"></span>Orange: the VM's wall</dt>
+      <dd><b>The hypervisor and the dashed boundary.</b> Every hop that crosses it is forwarded.</dd>
+    </div>
+    <div>
+      <dt><span class="dk-stack__swatch" data-plane="linux"></span>Green: Linux</dt>
+      <dd><b>The kernel containers need.</b> On a Mac it only exists inside the VM.</dd>
+    </div>
+  </dl>
+</div>
+
+<style>
+  /* Same frame as the other diagrams. */
+  .dk-stack {
+    --dk-stack-frame: min(100vw - 2rem, 68rem);
+
+    width: var(--dk-stack-frame);
+    margin-inline: calc((100% - var(--dk-stack-frame)) / 2);
+    margin-block: var(--space-lg);
+    padding-block: var(--space-sm) var(--space-xs);
+    border-block: var(--rule-hair) solid var(--color-rule);
+
+    /* One colour per layer owner; the soft versions fill the shapes. */
+    --dk-linux: oklch(50% 0.13 155);
+    --dk-mac: oklch(50% 0.15 255);
+    --dk-vm: oklch(56% 0.16 55);
+    --dk-linux-soft: oklch(87% 0.07 155);
+    --dk-mac-soft: oklch(86% 0.06 255);
+    --dk-vm-soft: oklch(87% 0.08 65);
+  }
+
+  :global(:root.dark) .dk-stack {
+    --dk-linux: oklch(76% 0.15 155);
+    --dk-mac: oklch(74% 0.13 250);
+    --dk-vm: oklch(76% 0.15 62);
+    --dk-linux-soft: oklch(36% 0.07 155);
+    --dk-mac-soft: oklch(36% 0.08 255);
+    --dk-vm-soft: oklch(38% 0.08 60);
+  }
+
+  .dk-stack [data-plane="linux"],
+  .dk-stack :global([data-plane="linux"]) {
+    --plane: var(--dk-linux);
+    --plane-soft: var(--dk-linux-soft);
+  }
+
+  .dk-stack [data-plane="mac"],
+  .dk-stack :global([data-plane="mac"]) {
+    --plane: var(--dk-mac);
+    --plane-soft: var(--dk-mac-soft);
+  }
+
+  .dk-stack [data-plane="vm"],
+  .dk-stack :global([data-plane="vm"]) {
+    --plane: var(--dk-vm);
+    --plane-soft: var(--dk-vm-soft);
+  }
+
+  .dk-stack__figure {
+    margin: 0;
+  }
+
+  .dk-stack__stage {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    cursor: grab;
+  }
+
+  .dk-stack__stage:active {
+    cursor: grabbing;
+  }
+
+  .dk-stack__stage :global(canvas),
+  .dk-stack__stage :global(.dk-stack__labels) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .dk-stack__stage :global(.dk-stack__labels) {
+    pointer-events: none;
+  }
+
+  .dk-stack__stage :global(.dk-stack__label) {
+    display: grid;
+    padding: 0.1rem 0.35rem;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-outlier);
+    font-size: 0.6875rem;
+    line-height: 1.35;
+    white-space: nowrap;
+    border-block-end: 2px solid var(--plane, transparent);
+  }
+
+  .dk-stack__stage :global(.dk-stack__label small) {
+    color: var(--color-muted);
+    font-size: inherit;
+  }
+
+  /* A node's place in the current flow; empty when it is not in it. */
+  .dk-stack__stage :global(.dk-stack__number:not(:empty)) {
+    justify-self: center;
+    min-width: 1.1rem;
+    margin-block-end: 0.15rem;
+    padding-inline: 0.2rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-weight: 600;
+    text-align: center;
+    border-radius: 999px;
+  }
+
+  .dk-stack__stage :global(.dk-stack__label--zone) {
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+
+  /* Rides along with a packet and names what it is at this layer. */
+  .dk-stack__stage :global(.dk-stack__tag) {
+    padding: 0 0.3rem;
+    border: var(--rule-hair) solid var(--plane);
+    background: var(--color-paper);
+    color: var(--plane);
+    font-family: var(--font-outlier);
+    font-size: 0.625rem;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  .dk-stack__fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    margin: 0;
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+
+  .dk-stack__steps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-xs);
+    margin-block-start: var(--space-sm);
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+
+  .dk-stack__steps button {
+    padding: 0.15rem 0.5rem;
+    border: var(--rule-hair) solid var(--color-rule-2);
+    background: none;
+    color: var(--color-ink);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .dk-stack__steps button[aria-pressed="true"] {
+    border-color: var(--plane, var(--color-ink));
+    background: var(--plane-soft, var(--color-paper-3));
+  }
+
+  .dk-stack__panel {
+    display: grid;
+    gap: 0.35rem;
+    /* Room for the longest step, so the page does not jump between steps. */
+    min-height: 22rem;
+    margin-block-start: var(--space-sm);
+    padding-block-start: var(--space-sm);
+    border-block-start: var(--rule-hair) solid var(--color-rule);
+    align-content: start;
+  }
+
+  .dk-stack__hops {
+    display: grid;
+    gap: 0.3rem;
+    max-width: 68ch;
+    margin: 0.4rem 0 0;
+    padding-inline-start: 1.4rem;
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .dk-stack__hops :global(.dk-stack__hop-route) {
+    display: block;
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+
+  .dk-stack__panel-title {
+    margin: 0;
+    color: var(--color-ink);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.5;
+  }
+
+  .dk-stack__panel-text {
+    margin: 0;
+    max-width: 62ch;
+    color: var(--color-ink-2);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+  }
+
+  .dk-stack__key {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+    gap: var(--space-sm) var(--space-md);
+    margin-block: var(--space-sm) 0;
+    padding-block-start: var(--space-sm);
+    border-block-start: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .dk-stack__key dt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-ink);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+  }
+
+  .dk-stack__key dd {
+    margin: 0.2rem 0 0;
+    color: var(--color-ink-2);
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .dk-stack__key b {
+    color: var(--color-ink);
+    font-weight: 600;
+  }
+
+  .dk-stack__swatch {
+    flex: none;
+    width: 0.8rem;
+    height: 0.8rem;
+    border: var(--rule-hair) solid var(--plane);
+    background: var(--plane-soft);
+  }
+
+  .dk-stack__swatch--wall {
+    border-style: dashed;
+    background: none;
+  }
+
+  figcaption {
+    max-width: 68ch;
+    margin-block-start: var(--space-sm);
+    color: var(--color-muted);
+    font-family: var(--font-outlier);
+    font-size: var(--text-xs);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 40rem) {
+    .dk-stack__stage {
+      aspect-ratio: 1;
+    }
+
+    .dk-stack__stage :global(.dk-stack__label small) {
+      display: none;
+    }
+
+    /* No room for every name: keep only the parts in the current flow. */
+    .dk-stack__stage :global(.dk-stack__label[data-dim]) {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import "./docker-mac-stack";
+</script>
