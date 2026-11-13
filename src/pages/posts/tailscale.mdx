@@ -106,6 +106,38 @@ tailscale ping server
 
 A reply `via DERP(...)` came through a relay, step 3 in the model. A reply via an `ip:port` is a direct tunnel, step 4. Usually the first reply or two are relayed and the rest are direct.
 
+## A real example: Rex
+
+Rex is a terminal multiplexer that can serve its API over a tailnet. The Rex server does not need Tailscale installed, but a Rex client does.
+
+### The server is a node by itself
+
+`rex server start --tailscale` serves the API "as an embedded tsnet node". tsnet is Tailscale's Go library. It runs the whole stack inside the process: WireGuard plus a userspace TCP/IP stack from gVisor.
+
+So the server joins the tailnet as its own device, named `rex` by default, with its own 100.x IP and node key. It creates no network interface and needs no root, no Tailscale app and no `tailscaled`.
+
+### The client is a plain socket
+
+`rex -S <host>` just opens an ordinary TCP connection. That only works if the machine is a tailnet node too:
+
+- **Routing.** `100.64.0.0/10` is not routable on the internet. The OS can only reach it once `tailscaled` has installed routes through its interface.
+- **MagicDNS.** `*.ts.net` names only resolve when Tailscale runs on the machine.
+- **WireGuard.** Both ends need keys the coordination server has introduced to each other. The server is a node, so the client must be one as well.
+
+### Identity is the password
+
+The tailnet listener has no password or token. It looks up the WireGuard key the packet came from, and by default admits only the node owner, your own account. A client outside the tailnet has no identity, so it is refused. Tailscale is both the transport and the auth.
+
+### The escape hatch
+
+A client can skip Tailscale with an SSH forward:
+
+```sh
+ssh -L /tmp/rex.sock:<server.sock> host
+```
+
+Then add the host with `unix:///tmp/rex.sock` as an endpoint. SSH now handles transport and auth.
+
 ## Sources
 
 - [How Tailscale works](https://tailscale.com/blog/how-tailscale-works)
@@ -115,3 +147,4 @@ A reply `via DERP(...)` came through a relay, step 3 in the model. A reply via a
 - [DERP servers](https://tailscale.com/kb/1232/derp-servers)
 - [Tailscale IP addresses](https://tailscale.com/kb/1015/100.x-addresses)
 - [WireGuard](https://www.wireguard.com/)
+- Rex CLI help: `rex server start --help`, `rex hosts add --help`

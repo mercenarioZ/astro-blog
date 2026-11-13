@@ -170,7 +170,7 @@ const mount = async (figure: HTMLElement, stage: HTMLElement) => {
   );
   relay.children[0].position.y = -0.15;
   relay.children[1].position.y = 0.65;
-  scene.add(relay, label("DERP relay", "run by Tailscale, near you", 0, -1, 0, "relay"));
+  scene.add(relay, label("DERP relay + STUN", "run by Tailscale, near you", 0, -1, 0, "relay"));
   const relayTop = new THREE.Vector3(0, 1.3, 0);
 
   const arc = (from: Vector3, to: Vector3, lift: number, bulge = 1) => {

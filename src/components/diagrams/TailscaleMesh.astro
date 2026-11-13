@@ -10,7 +10,7 @@
       class="ts-mesh__stage"
       data-ts-stage
       role="img"
-      aria-label="3D model of a tailnet. A laptop, a server and a phone each sit inside their own private network behind a NAT. A coordination server floats above them, linked to each device by a dashed control line. A DERP relay stands in the middle, linked to each device. Curved tunnels join the devices to each other directly."
+      aria-label="3D model of a tailnet. A laptop, a server and a phone each sit inside their own private network behind a NAT. A coordination server floats above them, linked to each device by a dashed control line. A DERP relay, which also answers STUN, stands in the middle, linked to each device. Curved tunnels join the devices to each other directly."
     >
       <p class="ts-mesh__fallback" data-ts-fallback>Loading the 3D model…</p>
     </div>
@@ -76,8 +76,8 @@
       <dd><b>Run by Tailscale.</b> The coordination server and its dashed lines. They carry public keys and access rules, never your data.</dd>
     </div>
     <div>
-      <dt><span class="ts-mesh__swatch" data-plane="relay"></span>Orange: the relay</dt>
-      <dd><b>Run by Tailscale, in 28 cities.</b> Your device picks the fastest one. It passes on encrypted packets it cannot read.</dd>
+      <dt><span class="ts-mesh__swatch" data-plane="relay"></span>Orange: the relay and STUN</dt>
+      <dd><b>Run by Tailscale, in 28 cities.</b> Your device picks the fastest one. It passes on encrypted packets it cannot read, and as a STUN server it tells each device its public address.</dd>
     </div>
     <div>
       <dt><span class="ts-mesh__swatch ts-mesh__swatch--line" data-plane="direct"></span>Green lines: direct tunnels</dt>
